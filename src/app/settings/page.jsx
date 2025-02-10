@@ -72,7 +72,6 @@ export default function SettingsPage() {
       <main className="flex-1 p-4 md:p-8">
         <div className="container max-w-7xl mx-auto">
           <div className="grid md:grid-cols-[250px_1fr] gap-6">
-            {/* Sidebar */}
             <Card className="dark:bg-zinc-800 p-4 h-fit">
               <nav className="space-y-2">
                 <Button

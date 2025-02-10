@@ -13,8 +13,8 @@ export function MealButton({ meal, selected, onClick }) {
       onClick={onClick}
       className={
         selected === meal 
-          ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-          : 'dark:hover:bg-zinc-700'
+          ? 'bg-blue-600 hover:bg-blue-700 text-white md:text-lg' 
+          : 'dark:hover:bg-zinc-700 dark:hover:text-gray-100 dark:hover:border-zinc-700  md:text-lg'
       }
     >
       {formattedMeal}
