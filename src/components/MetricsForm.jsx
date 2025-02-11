@@ -1,3 +1,5 @@
+//src/components/MetricsForm
+
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -33,6 +35,9 @@ export function MetricsForm({ onSubmit, initialData }) {
         inches: parseFloat(formData.inches),
         weight: parseFloat(formData.weight),
         age: parseFloat(formData.age),
+        gender: formData.gender,
+        activityLevel: formData.activityLevel,
+        goal: formData.goal
       };
       onSubmit(processedData);
   };
