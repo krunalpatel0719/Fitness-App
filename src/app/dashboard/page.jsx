@@ -50,37 +50,57 @@ import { db } from "@/lib/firebase";
 
 // New helper function that calls your FatSecret API route
 
+// async function searchFood(query) {
+//     try {
+//       const response = await fetch(`/api/foods?query=${encodeURIComponent(query)}`);
+//       const data = await response.json();
+
+//       if (!response.ok) {
+//         throw new Error(data.error || 'Unknown API error');
+//       }
+
+//       // Handle FatSecret's response format
+//       console.log(response)
+//       console.log(data)
+//       if (data.foods && data.foods.food) {
+//         return data.foods.food.map((food) => ({
+//           id: food.food_id,
+//           // Use a fallback if food.food_name is undefined
+//           name: food.food_name || "Unknown Food",
+//           // Parse calories from description if available
+//           calories: food.food_description && food.food_description.match(/(\d+)kcal/)?.[1]
+//                     ? Number(food.food_description.match(/(\d+)kcal/)[1])
+//                     : 0,
+//           servingSize: (food.serving_sizes && food.serving_sizes.serving && food.serving_sizes.serving.metric) || "100g"
+//         }));
+//       }
+
+//       return [];
+//     } catch (error) {
+//       console.error("Search failed:", error);
+//       throw error;
+//     }
+//   }
+
 async function searchFood(query) {
-    try {
-      const response = await fetch(`/api/foods?query=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Unknown API error');
-      }
-  
-      // Handle FatSecret's response format
-      console.log(response)
-      console.log(data)
-      if (data.foods && data.foods.food) {
-        return data.foods.food.map((food) => ({
-          id: food.food_id,
-          // Use a fallback if food.food_name is undefined
-          name: food.food_name || "Unknown Food",
-          // Parse calories from description if available
-          calories: food.food_description && food.food_description.match(/(\d+)kcal/)?.[1]
-                    ? Number(food.food_description.match(/(\d+)kcal/)[1])
-                    : 0,
-          servingSize: (food.serving_sizes && food.serving_sizes.serving && food.serving_sizes.serving.metric) || "100g"
-        }));
-      }
-      
-      return [];
-    } catch (error) {
-      console.error("Search failed:", error);
-      throw error;
+  try {
+    const response = await fetch(
+      `/api/foods?query=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Unknown API error");
     }
+
+    // Return the raw data instead of transforming it
+    return data.foods;
+  } catch (error) {
+    console.error("Search failed:", error);
+    throw error;
   }
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const { userLoggedIn, currentUser } = useAuth();
@@ -101,12 +121,8 @@ export default function Dashboard() {
   const [selectedFood, setSelectedFood] = useState(null);
   const [isNutritionLabelOpen, setIsNutritionLabelOpen] = useState(false);
 
-
-    
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (!userLoggedIn || !currentUser?.uid) {
@@ -144,10 +160,10 @@ export default function Dashboard() {
         snapshot.forEach((doc) => {
           const data = doc.data();
           entries.push({ id: doc.id, ...data });
-          total += data.calories;
+          total += Number(data.calories) || 0;
         });
         setFoodEntries(entries);
-        setCaloriesConsumed(total);
+        setCaloriesConsumed(Math.round(total)); // Round the total
         setLoadingFoodLog(false);
       },
       (error) => {
@@ -194,6 +210,56 @@ export default function Dashboard() {
     }
   };
 
+
+  const handleFoodSelection = async (foodId) => {
+    try {
+      const response = await fetch(`/api/foods?id=${foodId}`);
+      if (!response.ok) throw new Error("Food lookup failed");
+      const data = await response.json();
+      
+      if (data.food) {
+        setSelectedFood({
+          ...data.food,
+          
+          servingAmount: "1",
+          servingType: data.food.servings[0]?.description || "serving",
+          mealType: selectedMeal
+        });
+        setIsNutritionLabelOpen(true);
+      }
+    } catch (error) {
+      console.error("Food selection error:", error);
+      alert("Failed to load food details");
+    }
+  };
+
+  const handleAddFoodWithServing = async (foodData) => {
+    try {
+      await addDoc(collection(db, "food_logs"), {
+        userId: currentUser.uid,
+        foodName: foodData.food_name,
+        calories: foodData.calories,
+        protein: foodData.protein,
+        carbs: foodData.carbs,
+        fat: foodData.fat,
+        servingSize: foodData.servingType, // This should be the formatted serving
+        servingAmount: foodData.servingAmount,
+        servingType: foodData.servingType, // Add this line
+        mealType: foodData.mealType,
+        baseCalories: foodData.baseCalories,
+        baseProtein: foodData.baseProtein,
+        baseCarbs: foodData.baseCarbs,
+        baseFat: foodData.baseFat,
+        date: format(new Date(), "yyyy-MM-dd"),
+        createdAt: new Date()
+      });
+    } catch (error) {
+      console.error("Add food error:", error);
+      alert("Failed to save food entry");
+    }
+  };
+
+
   const handleSaveMetrics = async (metrics) => {
     try {
       const dailyCalories = calculateCalories(metrics);
@@ -211,18 +277,19 @@ export default function Dashboard() {
   const handleAddFood = async (e) => {
     e.preventDefault();
     if (!newFood.trim()) return;
-  
+
     setIsSearching(true);
     try {
       const results = await searchFood(newFood.trim());
-      console.log("API Results:", results);
-      
-      if (results.length > 0) {
-        setSearchResults(results);
+      if (results && results.food) {
+        console.log(results.food);
+        console.log(results.servings);
+        setSearchResults(results.food); // Set the raw food array
+        setTotalPages(Math.ceil(parseInt(results.total_results) / 10));
+        setCurrentPage(parseInt(results.page_number));
       }
     } catch (error) {
       console.error("Search error:", error);
-      // Show user feedback
       alert(`Search failed: ${error.message}`);
     } finally {
       setIsSearching(false);
@@ -257,10 +324,19 @@ export default function Dashboard() {
 
   const handleEditFood = async (updatedFood) => {
     try {
-      await updateDoc(doc(db, "food_logs", updatedFood.id), {
-        ...updatedFood,
-        updatedAt: new Date(),
-      });
+      const updatedData = {
+        foodName: updatedFood.foodName,
+        calories: Math.round(Number(updatedFood.calories)) || 0,
+        protein: Math.round(Number(updatedFood.protein)) || 0,
+        carbs: Math.round(Number(updatedFood.carbs)) || 0,
+        fat: Math.round(Number(updatedFood.fat)) || 0,
+        servingAmount: updatedFood.servingAmount,
+        servingType: updatedFood.servingType,
+        mealType: updatedFood.mealType,
+        updatedAt: new Date()
+      };
+  
+      await updateDoc(doc(db, "food_logs", updatedFood.id), updatedData);
       setSelectedFood(null);
       setIsNutritionLabelOpen(false);
     } catch (error) {
@@ -285,16 +361,18 @@ export default function Dashboard() {
   };
   const handleSearch = async (page = 1) => {
     if (!newFood.trim()) return;
-    
+
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/foods?query=${encodeURIComponent(newFood)}&page=${page}`);
+      const response = await fetch(
+        `/api/foods?query=${encodeURIComponent(newFood)}&page=${page}`
+      );
       const data = await response.json();
-      
+
       if (data.foods?.food) {
         setSearchResults(data.foods.food);
-        setCurrentPage(Number(data.foods.page_number));
-        setTotalPages(Math.ceil(data.foods.total_results / data.foods.max_results));
+        setTotalPages(data.foods.total_pages);
+        setCurrentPage(data.foods.page_number);
       }
     } catch (error) {
       console.error("Search error:", error);
@@ -304,33 +382,112 @@ export default function Dashboard() {
     }
   };
   
-  const handleFoodSelection = async (foodId) => {
+  // const handleFoodSelection = async (foodId) => {
+  //   if (!foodId) {
+  //     console.error("No food ID provided");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(`/api/foods?id=${foodId}`);
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const data = await response.json();
+  //     if (data.food) {
+  //       setSelectedFood(data.food);
+  //       setIsNutritionLabelOpen(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching food details:", error);
+  //   }
+  // };
+
+  const handleQuickAdd = async (food, serving) => {
     try {
-      const response = await fetch(`/api/foods?id=${foodId}`);
-      const data = await response.json();
-      setSelectedFood(data.food);
-      setIsNutritionLabelOpen(true);
-    } catch (error) {
-      console.error("Error fetching food details:", error);
-    }
-  };
+      // Ensure we're getting clean numbers
+      const calories = Math.round(Number(serving.calories)) || 0;
+      const protein = Math.round(Number(serving.protein)) || 0;
+      const carbs = Math.round(Number(serving.carbs)) || 0;
+      const fat = Math.round(Number(serving.fat)) || 0;
   
-  const handleQuickAdd = async (food) => {
-    try {
-      await addDoc(collection(db, "food_logs"), {
+      // Create the food log entry
+      const foodLogEntry = {
         userId: currentUser.uid,
         foodName: food.food_name,
-        calories: food.calories,
-        servingSize: food.serving_sizes?.serving?.metric || '100g',
+        baseCalories: calories, // Store base values
+        calories: calories,     // Store current values
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+        servingSize: formatServing(serving),
+        servingAmount: "1",
+        servingType: "serving",
         mealType: selectedMeal,
         date: format(new Date(), "yyyy-MM-dd"),
         createdAt: new Date(),
-      });
+      };
+  
+      await addDoc(collection(db, "food_logs"), foodLogEntry);
+      setSearchResults([]);
+      setNewFood("");
     } catch (error) {
       console.error("Quick add error:", error);
+      alert("Failed to add food item");
     }
   };
 
+  const formatServing = (serving) => {
+    if (!serving) return "";
+    
+    // Prioritize metric information
+    const metric = `${serving.metric_serving_amount || ''} ${serving.metric_serving_unit || ''}`.trim();
+    const description = serving.description || '';
+  
+    // If description contains metric info, just use description
+    if (description.toLowerCase().includes(metric.toLowerCase())) {
+      return description;
+    }
+  
+    // Combine description and metric if both exist
+    return [description, metric].filter(Boolean).join(" - ");
+  };
+
+  // const formatServing = (serving) => {
+  //   if (!serving || typeof serving !== 'object') return "";
+  
+  //   const metricAmount = serving.metric_serving_amount || '';
+  //   const metricUnit = serving.metric_serving_unit || '';
+  //   const description = serving.description || '';
+  
+  //   // If no meaningful data, return empty string
+  //   if (!metricAmount && !metricUnit && !description) return "";
+  
+  //   const metric = `${metricAmount} ${metricUnit}`.trim();
+  
+  //   // If description is empty, return just the metric
+  //   if (!description) return metric;
+  
+  //   // If metric is empty, return just the description
+  //   if (!metric) return description;
+  
+  //   // Safely check if description includes metric
+  //   if (description.toLowerCase().includes(metric.toLowerCase())) {
+  //     return description;
+  //   }
+  
+  //   // Check if metric units are already in description
+  //   const hasMetricUnit = metricUnit && description.toLowerCase().includes(metricUnit.toLowerCase());
+  
+  //   // If units are already included, return just description
+  //   if (hasMetricUnit) {
+  //     return description;
+  //   }
+  
+  //   // Otherwise return description with metric in parentheses
+  //   return `${description} (${metric})`;
+  // };
+  
 
   if (!userLoggedIn) return null;
 
@@ -459,7 +616,10 @@ export default function Dashboard() {
                               </TableRow>
                             ))
                         : foodEntries.map((entry) => (
-                            <TableRow className="hover:bg-transparent" key={entry.id}>
+                            <TableRow
+                              className="hover:bg-transparent"
+                              key={entry.id}
+                            >
                               <TableCell className="dark:text-gray-100 md:text-lg capitalize text-center">
                                 {entry.mealType}
                               </TableCell>
@@ -488,60 +648,82 @@ export default function Dashboard() {
                     </TableBody>
                   </Table>
                   {searchResults.length > 0 && (
-                <div className="mt-4 p-4 bg-white dark:bg-zinc-700 rounded-lg">
-                    <h3 className="text-lg font-bold mb-2 dark:text-white">Search Results</h3>
-                    <ul className="space-y-2">
-                    {searchResults.map((food, index) => (
-                        <li key={food.food_id || index}
+                    <div className="mt-4 p-4 bg-white dark:bg-zinc-700 rounded-lg">
+                      <h3 className="text-lg font-bold mb-2 dark:text-white">
+                        Search Results
+                      </h3>
+                      <ul className="space-y-2">
+                        {searchResults.map((food) => {
+                          const defaultServing =
+                            food.servings.find((s) => s.default) ||
+                            food.servings[0];
+                          return (
+                            <li
+                              key={food.food_id}
+                              className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-600 rounded cursor-pointer flex justify-between items-center"
+                              onClick={() => handleFoodSelection(food.food_id)}
+                            >
+                              <div>
+                                <div className="font-medium dark:text-white">
+                                  {food.food_name}
+                                </div>
+                                <div className="text-sm text-gray-600 dark:text-gray-300">
+                                  {food.brand_name &&
+                                    `Brand: ${food.brand_name}`}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {defaultServing?.calories || 0} kcal per{" "}
+                                  {formatServing(defaultServing)}
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleQuickAdd(food, defaultServing);
+                                }}
+                                className = "dark:hover:bg-zinc-700"
+                              >
+                                Quick Add
+                              </Button>
+                            </li>
+                          );
+                        })}
+                      </ul>
 
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-600 rounded cursor-pointer flex justify-between items-center"
-                        onClick={() => handleFoodSelection(food.food_id)}
+                      {/* Pagination controls */}
+                      <div className="flex justify-center gap-2 mt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSearch(currentPage - 1)}
+                          disabled={currentPage === 1}
                         >
-                        <div>
-                            <div className="font-medium dark:text-white">{food.food_name}</div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">
-                            {food.food_description}
-                            </div>
-                        </div>
-                        <Button 
-                            size="sm" 
-                            onClick={(e) => {
-                            e.stopPropagation();
-                            handleQuickAdd(food);
-                            }}
-                        >
-                            Quick Add
+                          Previous
                         </Button>
-                        </li>
-                    ))}
-                    </ul>
-                    {/* Pagination controls */}
-                    <div className="flex justify-center gap-2 mt-4">
-                    <Button
-                        variant="outline"
-                        onClick={() => handleSearch(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    >
-                        Previous
-                    </Button>
-                    <span className="px-4 py-2 text-gray-600 dark:text-gray-300">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <Button
-                        variant="outline"
-                        onClick={() => handleSearch(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next
-                    </Button>
+                        <span className="px-4 py-2 text-gray-600 dark:text-gray-300">
+                          Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSearch(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        > 
+                          Next
+                        </Button>
+                      </div>
                     </div>
-                </div>
-                )}
-                  <NutritionLabel
+                  )}
+              <NutritionLabel
                     isOpen={isNutritionLabelOpen}
                     onClose={handleNutritionLabelClose}
                     food={selectedFood}
-                    onEdit={handleEditFood}
+                    onEdit={(foodData) => {
+                      if (foodData.id) {
+                        handleEditFood(foodData);
+                      } else {
+                        handleAddFoodWithServing(foodData);
+                      }
+                    }}
                     onDelete={handleDeleteFood}
                   />
                 </CardContent>
