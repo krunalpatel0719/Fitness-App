@@ -1,7 +1,7 @@
 // src/app/dashboard/page.jsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/Navbar";
@@ -20,6 +20,8 @@ import { MetricsForm } from "@/components/MetricsForm";
 import { NutritionLabel } from "@/components/NutritionLabel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CiCircleInfo } from "react-icons/ci";
+import { FiX } from "react-icons/fi";
+
 
 // Commenting out OpenFoodFacts import for fallback:
 // import { searchFoodProducts } from "@/lib/openfoodfacts";
@@ -117,7 +119,7 @@ export default function Dashboard() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // For editing/deleting food entries:
+
   const [selectedFood, setSelectedFood] = useState(null);
   const [isNutritionLabelOpen, setIsNutritionLabelOpen] = useState(false);
 
@@ -163,7 +165,7 @@ export default function Dashboard() {
           total += Number(data.calories) || 0;
         });
         setFoodEntries(entries);
-        setCaloriesConsumed(Math.round(total)); // Round the total
+        setCaloriesConsumed(Math.round(total)); 
         setLoadingFoodLog(false);
       },
       (error) => {
@@ -179,11 +181,9 @@ export default function Dashboard() {
   }, [currentUser, userLoggedIn, router]);
 
   const calculateCalories = (metrics) => {
-    // Convert weight from lbs to kg
+
     const weightKg = parseFloat(metrics.weight) * 0.453592;
-    // Convert height from feet/inches to centimeters
-    const heightCm =
-      parseFloat(metrics.feet) * 30.48 + parseFloat(metrics.inches) * 2.54;
+    const heightCm = parseFloat(metrics.feet) * 30.48 + parseFloat(metrics.inches) * 2.54;
 
     // Mifflin-St Jeor Equation (metric)
     let bmr = 10 * weightKg + 6.25 * heightCm - 5 * parseFloat(metrics.age);
@@ -200,6 +200,7 @@ export default function Dashboard() {
     const tdee = bmr * activityMultipliers[metrics.activityLevel];
 
     // Adjust for goal: subtract 500 for weight loss, add 500 for weight gain
+    
     switch (metrics.goal) {
       case "lose":
         return Math.round(tdee - 500);
@@ -238,13 +239,14 @@ export default function Dashboard() {
       await addDoc(collection(db, "food_logs"), {
         userId: currentUser.uid,
         foodName: foodData.food_name,
+        food_id: foodData.food_id, // Add food_id
         calories: foodData.calories,
         protein: foodData.protein,
         carbs: foodData.carbs,
         fat: foodData.fat,
-        servingSize: foodData.servingType, // This should be the formatted serving
+        servingSize: foodData.servingType,
         servingAmount: foodData.servingAmount,
-        servingType: foodData.servingType, // Add this line
+        servingType: foodData.servingType,
         mealType: foodData.mealType,
         baseCalories: foodData.baseCalories,
         baseProtein: foodData.baseProtein,
@@ -258,7 +260,6 @@ export default function Dashboard() {
       alert("Failed to save food entry");
     }
   };
-
 
   const handleSaveMetrics = async (metrics) => {
     try {
@@ -324,16 +325,25 @@ export default function Dashboard() {
 
   const handleEditFood = async (updatedFood) => {
     try {
+      const selectedServing = updatedFood.servings.find(s => 
+        s.description === updatedFood.servingType
+      );
+  
       const updatedData = {
-        foodName: updatedFood.foodName,
-        calories: Math.round(Number(updatedFood.calories)) || 0,
-        protein: Math.round(Number(updatedFood.protein)) || 0,
-        carbs: Math.round(Number(updatedFood.carbs)) || 0,
-        fat: Math.round(Number(updatedFood.fat)) || 0,
+        foodName: updatedFood.food_name,
+        food_id: updatedFood.food_id, // Add food_id
+        calories: Math.round(Number(selectedServing.calories) * parseFloat(updatedFood.servingAmount)),
+        protein: Math.round(Number(selectedServing.protein) * parseFloat(updatedFood.servingAmount)),
+        carbs: Math.round(Number(selectedServing.carbs) * parseFloat(updatedFood.servingAmount)),
+        fat: Math.round(Number(selectedServing.fat) * parseFloat(updatedFood.servingAmount)),
         servingAmount: updatedFood.servingAmount,
         servingType: updatedFood.servingType,
         mealType: updatedFood.mealType,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        baseCalories: selectedServing.calories,
+        baseProtein: selectedServing.protein,
+        baseCarbs: selectedServing.carbs,
+        baseFat: selectedServing.fat
       };
   
       await updateDoc(doc(db, "food_logs", updatedFood.id), updatedData);
@@ -343,7 +353,6 @@ export default function Dashboard() {
       console.error("Error updating food:", error);
     }
   };
-
   const handleDeleteFood = async () => {
     if (!selectedFood?.id) return;
     try {
@@ -405,18 +414,17 @@ export default function Dashboard() {
 
   const handleQuickAdd = async (food, serving) => {
     try {
-      // Ensure we're getting clean numbers
       const calories = Math.round(Number(serving.calories)) || 0;
       const protein = Math.round(Number(serving.protein)) || 0;
       const carbs = Math.round(Number(serving.carbs)) || 0;
       const fat = Math.round(Number(serving.fat)) || 0;
   
-      // Create the food log entry
       const foodLogEntry = {
         userId: currentUser.uid,
         foodName: food.food_name,
-        baseCalories: calories, // Store base values
-        calories: calories,     // Store current values
+        food_id: food.food_id, // Add food_id
+        baseCalories: calories,
+        calories: calories,
         protein: protein,
         carbs: carbs,
         fat: fat,
@@ -436,7 +444,7 @@ export default function Dashboard() {
       alert("Failed to add food item");
     }
   };
-
+  
   const formatServing = (serving) => {
     if (!serving) return "";
     
@@ -452,41 +460,6 @@ export default function Dashboard() {
     // Combine description and metric if both exist
     return [description, metric].filter(Boolean).join(" - ");
   };
-
-  // const formatServing = (serving) => {
-  //   if (!serving || typeof serving !== 'object') return "";
-  
-  //   const metricAmount = serving.metric_serving_amount || '';
-  //   const metricUnit = serving.metric_serving_unit || '';
-  //   const description = serving.description || '';
-  
-  //   // If no meaningful data, return empty string
-  //   if (!metricAmount && !metricUnit && !description) return "";
-  
-  //   const metric = `${metricAmount} ${metricUnit}`.trim();
-  
-  //   // If description is empty, return just the metric
-  //   if (!description) return metric;
-  
-  //   // If metric is empty, return just the description
-  //   if (!metric) return description;
-  
-  //   // Safely check if description includes metric
-  //   if (description.toLowerCase().includes(metric.toLowerCase())) {
-  //     return description;
-  //   }
-  
-  //   // Check if metric units are already in description
-  //   const hasMetricUnit = metricUnit && description.toLowerCase().includes(metricUnit.toLowerCase());
-  
-  //   // If units are already included, return just description
-  //   if (hasMetricUnit) {
-  //     return description;
-  //   }
-  
-  //   // Otherwise return description with metric in parentheses
-  //   return `${description} (${metric})`;
-  // };
   
 
   if (!userLoggedIn) return null;
@@ -634,13 +607,80 @@ export default function Dashboard() {
                               </TableCell>
                               <TableCell className="text-center">
                                 <div className="flex justify-center items-center h-full">
-                                  <CiCircleInfo
-                                    className="h-5 w-5 dark:text-white md:h-7 md:w-7 cursor-pointer hover:text-blue-500 transition-colors"
-                                    onClick={() => {
-                                      setSelectedFood(entry);
+                                <CiCircleInfo
+                                  className="h-5 w-5 dark:text-white md:h-7 md:w-7 cursor-pointer hover:text-blue-500 transition-colors"
+                                  onClick={async () => {
+                                    try {
+                                      if (!entry.food_id) {
+                                        // If no food_id, just show the existing entry data
+                                        setSelectedFood({
+                                          id: entry.id,
+                                          food_name: entry.foodName,
+                                          servingAmount: entry.servingAmount,
+                                          servingType: entry.servingType,
+                                          mealType: entry.mealType,
+                                          calories: entry.calories,
+                                          protein: entry.protein,
+                                          carbs: entry.carbs,
+                                          fat: entry.fat,
+                                          servings: [{
+                                            description: entry.servingType,
+                                            calories: entry.baseCalories || entry.calories,
+                                            protein: entry.baseProtein || entry.protein,
+                                            carbs: entry.baseCarbs || entry.carbs,
+                                            fat: entry.baseFat || entry.fat
+                                          }]
+                                        });
+                                        setIsNutritionLabelOpen(true);
+                                        return;
+                                      }
+
+                                      // Fetch fresh food data when clicking info icon
+                                      const response = await fetch(`/api/foods?id=${entry.food_id}`);
+                                      if (!response.ok) throw new Error("Food lookup failed");
+                                      const data = await response.json();
+                                      
+                                      if (data.food) {
+                                        setSelectedFood({
+                                          ...data.food,
+                                          id: entry.id,
+                                          food_id: entry.food_id,
+                                          servingAmount: entry.servingAmount,
+                                          servingType: entry.servingType,
+                                          mealType: entry.mealType,
+                                          calories: entry.calories,
+                                          protein: entry.protein,
+                                          carbs: entry.carbs,
+                                          fat: entry.fat
+                                        });
+                                        setIsNutritionLabelOpen(true);
+                                      }
+                                    } catch (error) {
+                                      console.error("Error fetching food details:", error);
+                                    
+                                      setSelectedFood({
+                                        id: entry.id,
+                                        food_name: entry.foodName,
+                                        servingAmount: entry.servingAmount,
+                                        servingType: entry.servingType,
+                                        mealType: entry.mealType,
+                                        calories: entry.calories,
+                                        protein: entry.protein,
+                                        carbs: entry.carbs,
+                                        fat: entry.fat,
+                                        servings: [{
+                                          description: entry.servingType,
+                                          calories: entry.baseCalories || entry.calories,
+                                          protein: entry.baseProtein || entry.protein,
+                                          carbs: entry.baseCarbs || entry.carbs,
+                                          fat: entry.baseFat || entry.fat
+                                        }]
+                                      });
                                       setIsNutritionLabelOpen(true);
-                                    }}
-                                  />
+                                    }
+                                  }}
+                                />
+
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -649,9 +689,20 @@ export default function Dashboard() {
                   </Table>
                   {searchResults.length > 0 && (
                     <div className="mt-4 p-4 bg-white dark:bg-zinc-700 rounded-lg">
+                      <div className = 'flex justify-between items-center'>  
                       <h3 className="text-lg font-bold mb-2 dark:text-white">
                         Search Results
                       </h3>
+                      
+                        <FiX 
+                          onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSearchResults([]);
+                                  setNewFood("");
+                                }} 
+                          className="mb-4 mr-2 h-5 w-5 dark:text-white hover:text-red-500" 
+                          />
+                        </div>
                       <ul className="space-y-2">
                         {searchResults.map((food) => {
                           const defaultServing =
@@ -707,13 +758,13 @@ export default function Dashboard() {
                           variant="outline"
                           onClick={() => handleSearch(currentPage + 1)}
                           disabled={currentPage === totalPages}
-                        > 
+                        >
                           Next
                         </Button>
                       </div>
                     </div>
                   )}
-              <NutritionLabel
+                <NutritionLabel
                     isOpen={isNutritionLabelOpen}
                     onClose={handleNutritionLabelClose}
                     food={selectedFood}

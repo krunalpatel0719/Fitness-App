@@ -52,12 +52,15 @@
   
         if (!apiResponse.ok) throw new Error("API error");
         const foodData = await apiResponse.json();
-  
+        
+
+       
         // Format response
         const formattedFood = {
           food_id: foodData.food.food_id,
           food_name: foodData.food.food_name,
           brand_name: foodData.food.brand_name,
+          food_type: foodData.food.food_type,
           servings: foodData.food.servings.serving.map(serving => ({
             serving_id: serving.serving_id,
             description: serving.serving_description,
@@ -65,8 +68,27 @@
             protein: Number(serving.protein),
             carbs: Number(serving.carbohydrate),
             fat: Number(serving.fat),
+            saturated_fat: Number(serving.saturated_fat),
+            polyunsaturated_fat: Number(serving.polyunsaturated_fat),
+            monounsaturated_fat: Number(serving.monounsaturated_fat),
+            trans_fat:  Number(serving.trans_fat),
+            cholesterol:  Number(serving.cholesterol),
+            sodium:  Number(serving.sodium),
+            potassium:  Number(serving.potassium),
+            fiber: Number(serving.fiber),
+            sugar:  Number(serving.sugar),
+            added_sugar:  Number(serving.added_sugar),
+            vitamin_d:  Number(serving.vitamin_d),
+            calcium:  Number(serving.calcium),
+            iron:  Number(serving.iron),
+            vitamin_a:  Number(serving.vitamin_a),
+            vitamin_c:  Number(serving.vitamin_c),
+            iron:  Number(serving.iron),
+
             metric_serving_amount: serving.metric_serving_amount,
             metric_serving_unit: serving.metric_serving_unit,
+            number_of_units: serving.number_of_units,
+            measurement_description: serving.measurement_description,
             default: serving.is_default === "1"
           }))
         };
