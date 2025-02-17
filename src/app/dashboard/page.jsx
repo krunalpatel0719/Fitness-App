@@ -95,13 +95,13 @@ async function searchFood(query) {
       throw new Error(data.error || "Unknown API error");
     }
 
-    // Return the raw data instead of transforming it
     return data.foods;
   } catch (error) {
     console.error("Search failed:", error);
     throw error;
   }
 }
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -211,7 +211,91 @@ export default function Dashboard() {
     }
   };
 
-
+  const formatServingDisplay = (amount, type) => {
+    if (!amount || !type) return "";
+    
+    const numericAmount = parseFloat(amount);
+    
+    const nonPluralUnits = ['g', 'oz', 'ml', 'kg', 'lb', 'mg', 'dl', 'cl'];
+    
+    if (type.toLowerCase().includes('serving')) {
+      return `${numericAmount} ${numericAmount > 1 ? 'Servings' : 'Serving'}`;
+    }
+  
+    const typeMatch = type.match(/^(\d+(\.\d+)?)\s+(.+)$/);
+    if (typeMatch) {
+      const [_, typeAmount, __, description] = typeMatch;
+      const totalAmount = numericAmount * parseFloat(typeAmount);
+  
+      const hasParentheses = description.includes('(');
+      if (hasParentheses) {
+        const [mainText, parenthetical] = description.split(/\s*(\(.*\))/);
+        const words = mainText.trim().split(' ');
+        const lastWord = words[words.length - 1];
+  
+        const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+          lastWord.toLowerCase().endsWith(unit.toLowerCase())
+        );
+  
+        if (!endsWithNonPluralUnit && totalAmount > 1 && !lastWord.endsWith('s')) {
+          words[words.length - 1] = `${lastWord}s`;
+        }
+        return `${totalAmount} ${words.join(' ')} ${parenthetical}`;
+      }
+      // Handle non-parenthetical cases as before
+      const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+        description.toLowerCase().endsWith(unit.toLowerCase())
+      );
+  
+      if (endsWithNonPluralUnit) {
+        return `${totalAmount} ${description}`;
+      }
+  
+      const words = description.split(' ');
+      const lastWord = words[words.length - 1];
+      
+      if (totalAmount > 1 && !lastWord.endsWith('s')) {
+        words[words.length - 1] = `${lastWord}s`;
+      }
+      return `${totalAmount} ${words.join(' ')}`;
+    }
+  
+    // Handle simple cases without numbers in the type
+    const hasParentheses = type.includes('(');
+    if (hasParentheses) {
+      const [mainText, parenthetical] = type.split(/(\(.*\))/);
+      const words = mainText.trim().split(' ');
+      const lastWord = words[words.length - 1];
+  
+      const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+        lastWord.toLowerCase().endsWith(unit.toLowerCase())
+      );
+  
+      if (!endsWithNonPluralUnit && numericAmount > 1 && !lastWord.endsWith('s')) {
+        words[words.length - 1] = `${lastWord}s`;
+      }
+      return `${numericAmount} ${words.join(' ')} + ${parenthetical}`;
+    }
+  
+    // Handle remaining cases
+    const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+      type.toLowerCase().endsWith(unit.toLowerCase())
+    );
+  
+    if (endsWithNonPluralUnit) {
+      return `${numericAmount} ${type}`;
+    }
+  
+    const words = type.split(' ');
+    const lastWord = words[words.length - 1];
+    
+    if (numericAmount > 1 && !lastWord.endsWith('s')) {
+      words[words.length - 1] = `${lastWord}s`;
+    }
+  
+    return `${numericAmount} ${type}`;
+  };
+  
   const handleFoodSelection = async (foodId) => {
     try {
       const response = await fetch(`/api/foods?id=${foodId}`);
@@ -233,6 +317,62 @@ export default function Dashboard() {
       alert("Failed to load food details");
     }
   };
+
+  const handleAddFood = async (e) => {
+    e.preventDefault();
+    if (!newFood.trim()) return;
+
+    setIsSearching(true);
+    try {
+      const results = await searchFood(newFood.trim());
+      if (results && results.food) {
+        console.log(results.food);
+        console.log(results.servings);
+        setSearchResults(results.food); // Set the raw food array
+        setTotalPages(Math.ceil(parseInt(results.total_results) / 10));
+        setCurrentPage(parseInt(results.page_number));
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      alert(`Search failed: ${error.message}`);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleQuickAdd = async (food, serving) => {
+    try {
+      const calories = Math.round(Number(serving.calories)) || 0;
+      const protein = Math.round(Number(serving.protein)) || 0;
+      const carbs = Math.round(Number(serving.carbs)) || 0;
+      const fat = Math.round(Number(serving.fat)) || 0;
+  
+      const foodLogEntry = {
+        userId: currentUser.uid,
+        foodName: food.food_name,
+        food_id: food.food_id, // Add food_id
+        baseCalories: calories,
+        calories: calories,
+        protein: protein,
+        carbs: carbs,
+        fat: fat,
+        servingSize: formatServing(serving),
+        servingAmount: "1",
+        servingType: "serving",
+        mealType: selectedMeal,
+        date: format(new Date(), "yyyy-MM-dd"),
+        createdAt: new Date(),
+      };
+  
+      await addDoc(collection(db, "food_logs"), foodLogEntry);
+      setSearchResults([]);
+      setNewFood("");
+    } catch (error) {
+      console.error("Quick add error:", error);
+      alert("Failed to add food item");
+    }
+  };
+
 
   const handleAddFoodWithServing = async (foodData) => {
     try {
@@ -260,69 +400,7 @@ export default function Dashboard() {
       alert("Failed to save food entry");
     }
   };
-
-  const handleSaveMetrics = async (metrics) => {
-    try {
-      const dailyCalories = calculateCalories(metrics);
-      await setDoc(doc(db, "user_metrics", currentUser.uid), {
-        ...metrics,
-        dailyCalories,
-        userId: currentUser.uid,
-        createdAt: new Date(),
-      });
-      setUserMetrics({ ...metrics, dailyCalories });
-    } catch (error) {
-      console.error("Error saving metrics:", error);
-    }
-  };
-  const handleAddFood = async (e) => {
-    e.preventDefault();
-    if (!newFood.trim()) return;
-
-    setIsSearching(true);
-    try {
-      const results = await searchFood(newFood.trim());
-      if (results && results.food) {
-        console.log(results.food);
-        console.log(results.servings);
-        setSearchResults(results.food); // Set the raw food array
-        setTotalPages(Math.ceil(parseInt(results.total_results) / 10));
-        setCurrentPage(parseInt(results.page_number));
-      }
-    } catch (error) {
-      console.error("Search error:", error);
-      alert(`Search failed: ${error.message}`);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleSelectFood = async (food) => {
-    if (!food.name) {
-      console.error("Selected food has no name", food);
-      alert("Selected food data is incomplete.");
-      return;
-    }
-    setLoadingFood(true);
-    try {
-      await addDoc(collection(db, "food_logs"), {
-        userId: currentUser.uid,
-        foodName: food.name,
-        calories: food.calories,
-        servingSize: food.servingSize,
-        mealType: selectedMeal,
-        date: format(new Date(), "yyyy-MM-dd"),
-        createdAt: new Date(),
-      });
-      setSearchResults([]);
-      setNewFood("");
-    } catch (error) {
-      console.error("Add food error:", error);
-    } finally {
-      setLoadingFood(false);
-    }
-  };
-
+  
   const handleEditFood = async (updatedFood) => {
     try {
       const selectedServing = updatedFood.servings.find(s => 
@@ -353,6 +431,24 @@ export default function Dashboard() {
       console.error("Error updating food:", error);
     }
   };
+
+  
+  const handleSaveMetrics = async (metrics) => {
+    try {
+      const dailyCalories = calculateCalories(metrics);
+      await setDoc(doc(db, "user_metrics", currentUser.uid), {
+        ...metrics,
+        dailyCalories,
+        userId: currentUser.uid,
+        createdAt: new Date(),
+      });
+      setUserMetrics({ ...metrics, dailyCalories });
+    } catch (error) {
+      console.error("Error saving metrics:", error);
+    }
+  };
+ 
+
   const handleDeleteFood = async () => {
     if (!selectedFood?.id) return;
     try {
@@ -412,38 +508,7 @@ export default function Dashboard() {
   //   }
   // };
 
-  const handleQuickAdd = async (food, serving) => {
-    try {
-      const calories = Math.round(Number(serving.calories)) || 0;
-      const protein = Math.round(Number(serving.protein)) || 0;
-      const carbs = Math.round(Number(serving.carbs)) || 0;
-      const fat = Math.round(Number(serving.fat)) || 0;
   
-      const foodLogEntry = {
-        userId: currentUser.uid,
-        foodName: food.food_name,
-        food_id: food.food_id, // Add food_id
-        baseCalories: calories,
-        calories: calories,
-        protein: protein,
-        carbs: carbs,
-        fat: fat,
-        servingSize: formatServing(serving),
-        servingAmount: "1",
-        servingType: "serving",
-        mealType: selectedMeal,
-        date: format(new Date(), "yyyy-MM-dd"),
-        createdAt: new Date(),
-      };
-  
-      await addDoc(collection(db, "food_logs"), foodLogEntry);
-      setSearchResults([]);
-      setNewFood("");
-    } catch (error) {
-      console.error("Quick add error:", error);
-      alert("Failed to add food item");
-    }
-  };
   
   const formatServing = (serving) => {
     if (!serving) return "";
@@ -600,7 +665,7 @@ export default function Dashboard() {
                                 {entry.foodName}
                               </TableCell>
                               <TableCell className="dark:text-gray-100 md:text-lg text-center capitalize">
-                                {entry.servingAmount + " " + entry.servingType}
+                                 {formatServingDisplay(entry.servingAmount, entry.servingType)}
                               </TableCell>
                               <TableCell className="dark:text-gray-100 md:text-lg text-center">
                                 {entry.calories}
