@@ -211,91 +211,148 @@ export default function Dashboard() {
     }
   };
 
+  // const formatServingDisplay = (amount, type) => {
+  //   if (!amount || !type) return "";
+    
+  //   const numericAmount = parseFloat(amount);
+    
+  //   const nonPluralUnits = ['g', 'oz', 'ml', 'kg', 'lb', 'mg', 'dl', 'cl'];
+    
+  //   if (type.toLowerCase().includes('serving')) {
+  //     return `${numericAmount} ${numericAmount > 1 ? 'Servings' : 'Serving'}`;
+  //   }
+  
+  //   const typeMatch = type.match(/^(\d+(\.\d+)?)\s+(.+)$/);
+  //   if (typeMatch) {
+  //     const [_, typeAmount, __, description] = typeMatch;
+  //     const totalAmount = numericAmount * parseFloat(typeAmount);
+  
+  //     const hasParentheses = description.includes('(');
+  //     if (hasParentheses) {
+  //       const [mainText, parenthetical] = description.split(/\s*(\(.*\))/);
+  //       const words = mainText.trim().split(' ');
+  //       const lastWord = words[words.length - 1];
+  
+  //       const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+  //         lastWord.toLowerCase().endsWith(unit.toLowerCase())
+  //       );
+  
+  //       if (!endsWithNonPluralUnit && totalAmount > 1 && !lastWord.endsWith('s')) {
+  //         words[words.length - 1] = `${lastWord}s`;
+  //       }
+  //       return `${totalAmount} ${words.join(' ')} ${parenthetical}`;
+  //     }
+  //     // Handle non-parenthetical cases as before
+  //     const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+  //       description.toLowerCase().endsWith(unit.toLowerCase())
+  //     );
+  
+  //     if (endsWithNonPluralUnit) {
+  //       return `${totalAmount} ${description}`;
+  //     }
+  
+  //     const words = description.split(' ');
+  //     const lastWord = words[words.length - 1];
+      
+  //     if (totalAmount > 1 && !lastWord.endsWith('s')) {
+  //       words[words.length - 1] = `${lastWord}s`;
+  //     }
+  //     return `${totalAmount} ${words.join(' ')}`;
+  //   }
+  
+  //   // Handle simple cases without numbers in the type
+  //   const hasParentheses = type.includes('(');
+  //   if (hasParentheses) {
+  //     const [mainText, parenthetical] = type.split(/(\(.*\))/);
+  //     const words = mainText.trim().split(' ');
+  //     const lastWord = words[words.length - 1];
+  
+  //     const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+  //       lastWord.toLowerCase().endsWith(unit.toLowerCase())
+  //     );
+  
+  //     if (!endsWithNonPluralUnit && numericAmount > 1 && !lastWord.endsWith('s')) {
+  //       words[words.length - 1] = `${lastWord}s`;
+  //     }
+  //     return `${numericAmount} ${words.join(' ')} + ${parenthetical}`;
+  //   }
+  
+  //   // Handle remaining cases
+  //   const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+  //     type.toLowerCase().endsWith(unit.toLowerCase())
+  //   );
+  
+  //   if (endsWithNonPluralUnit) {
+  //     return `${numericAmount} ${type}`;
+  //   }
+  
+  //   const words = type.split(' ');
+  //   const lastWord = words[words.length - 1];
+    
+  //   if (numericAmount > 1 && !lastWord.endsWith('s')) {
+  //     words[words.length - 1] = `${lastWord}s`;
+  //   }
+  
+  //   return `${numericAmount} ${type}`;
+  // };
+  
+
   const formatServingDisplay = (amount, type) => {
     if (!amount || !type) return "";
     
     const numericAmount = parseFloat(amount);
-    
     const nonPluralUnits = ['g', 'oz', 'ml', 'kg', 'lb', 'mg', 'dl', 'cl'];
-    
+  
+    // Helper function to check if word should be pluralized
+    const shouldPluralize = (word) => {
+      const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
+        word.toLowerCase().endsWith(unit.toLowerCase())
+      );
+      return !endsWithNonPluralUnit && numericAmount > 1 && !word.endsWith('s');
+    };
+  
+    // Helper function to pluralize text
+    const pluralize = (text) => {
+      const words = text.trim().split(' ');
+      const lastWord = words[words.length - 1];
+      
+      if (shouldPluralize(lastWord)) {
+        words[words.length - 1] = `${lastWord}s`;
+      }
+      return words.join(' ');
+    };
+  
+    // Handle "serving" case
     if (type.toLowerCase().includes('serving')) {
       return `${numericAmount} ${numericAmount > 1 ? 'Servings' : 'Serving'}`;
     }
   
+    // Check if type starts with a number (e.g., "1 cup", "2 slices")
     const typeMatch = type.match(/^(\d+(\.\d+)?)\s+(.+)$/);
     if (typeMatch) {
       const [_, typeAmount, __, description] = typeMatch;
       const totalAmount = numericAmount * parseFloat(typeAmount);
   
-      const hasParentheses = description.includes('(');
-      if (hasParentheses) {
+      // Handle text with parentheses
+      if (description.includes('(')) {
         const [mainText, parenthetical] = description.split(/\s*(\(.*\))/);
-        const words = mainText.trim().split(' ');
-        const lastWord = words[words.length - 1];
-  
-        const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
-          lastWord.toLowerCase().endsWith(unit.toLowerCase())
-        );
-  
-        if (!endsWithNonPluralUnit && totalAmount > 1 && !lastWord.endsWith('s')) {
-          words[words.length - 1] = `${lastWord}s`;
-        }
-        return `${totalAmount} ${words.join(' ')} ${parenthetical}`;
-      }
-      // Handle non-parenthetical cases as before
-      const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
-        description.toLowerCase().endsWith(unit.toLowerCase())
-      );
-  
-      if (endsWithNonPluralUnit) {
-        return `${totalAmount} ${description}`;
+        return `${totalAmount} ${pluralize(mainText)} ${parenthetical}`;
       }
   
-      const words = description.split(' ');
-      const lastWord = words[words.length - 1];
-      
-      if (totalAmount > 1 && !lastWord.endsWith('s')) {
-        words[words.length - 1] = `${lastWord}s`;
-      }
-      return `${totalAmount} ${words.join(' ')}`;
+      // Handle standard text
+      return `${totalAmount} ${pluralize(description)}`;
     }
   
-    // Handle simple cases without numbers in the type
-    const hasParentheses = type.includes('(');
-    if (hasParentheses) {
-      const [mainText, parenthetical] = type.split(/(\(.*\))/);
-      const words = mainText.trim().split(' ');
-      const lastWord = words[words.length - 1];
-  
-      const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
-        lastWord.toLowerCase().endsWith(unit.toLowerCase())
-      );
-  
-      if (!endsWithNonPluralUnit && numericAmount > 1 && !lastWord.endsWith('s')) {
-        words[words.length - 1] = `${lastWord}s`;
-      }
-      return `${numericAmount} ${words.join(' ')} + ${parenthetical}`;
+    // Handle type without leading number
+    if (type.includes('(')) {
+      const [mainText, parenthetical] = type.split(/\s*(\(.*\))/);
+      return `${numericAmount} ${pluralize(mainText)} ${parenthetical}`;
     }
   
-    // Handle remaining cases
-    const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
-      type.toLowerCase().endsWith(unit.toLowerCase())
-    );
-  
-    if (endsWithNonPluralUnit) {
-      return `${numericAmount} ${type}`;
-    }
-  
-    const words = type.split(' ');
-    const lastWord = words[words.length - 1];
-    
-    if (numericAmount > 1 && !lastWord.endsWith('s')) {
-      words[words.length - 1] = `${lastWord}s`;
-    }
-  
-    return `${numericAmount} ${type}`;
+    // Handle basic cases
+    return `${numericAmount} ${pluralize(type)}`;
   };
-  
+
   const handleFoodSelection = async (foodId) => {
     try {
       const response = await fetch(`/api/foods?id=${foodId}`);
@@ -350,7 +407,7 @@ export default function Dashboard() {
       const foodLogEntry = {
         userId: currentUser.uid,
         foodName: food.food_name,
-        food_id: food.food_id, // Add food_id
+        food_id: food.food_id, 
         baseCalories: calories,
         calories: calories,
         protein: protein,
@@ -358,15 +415,15 @@ export default function Dashboard() {
         fat: fat,
         servingSize: formatServing(serving),
         servingAmount: "1",
-        servingType: "serving",
+        servingType: serving.description,
         mealType: selectedMeal,
         date: format(new Date(), "yyyy-MM-dd"),
         createdAt: new Date(),
       };
   
       await addDoc(collection(db, "food_logs"), foodLogEntry);
-      setSearchResults([]);
-      setNewFood("");
+      // setSearchResults([]);
+      // setNewFood("");
     } catch (error) {
       console.error("Quick add error:", error);
       alert("Failed to add food item");
@@ -379,7 +436,7 @@ export default function Dashboard() {
       await addDoc(collection(db, "food_logs"), {
         userId: currentUser.uid,
         foodName: foodData.food_name,
-        food_id: foodData.food_id, // Add food_id
+        food_id: foodData.food_id, 
         calories: foodData.calories,
         protein: foodData.protein,
         carbs: foodData.carbs,
