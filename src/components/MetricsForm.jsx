@@ -43,7 +43,7 @@ export function MetricsForm({ onSubmit, initialData }) {
   };
 
   return (
-    <Card className="dark:bg-zinc-800 max-w-2xl mx-auto">
+    <Card className="dark:bg-zinc-800 max-w-2xl mx-auto ">
       <CardHeader>
         <CardTitle className="dark:text-white text-2xl">
           Set Up Your Profile

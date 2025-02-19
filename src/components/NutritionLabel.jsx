@@ -170,7 +170,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent hideClose={true} className="max-w-md dark:bg-zinc-800">
+      <DialogContent hideClose={true} className="max-w-md dark:bg-zinc-800 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="dark:text-white text-xl md:text-2xl border-b-2 border-gray-700 w-full pb-1">

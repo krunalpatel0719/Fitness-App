@@ -132,7 +132,7 @@ export default function SettingsPage() {
 
       {/* Metrics Update Dialog */}
       <Dialog  open={openMetricsDialog} onOpenChange={setOpenMetricsDialog} >
-        <DialogContent hideClose = {true} className="max-w-2xl mx-auto dark:bg-zinc-800 p-6">
+        <DialogContent hideClose = {true} className="max-w-2xl mx-auto dark:bg-zinc-800 p-6 mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="dark:text-white flex items-center justify-between">
               Update Health Metrics

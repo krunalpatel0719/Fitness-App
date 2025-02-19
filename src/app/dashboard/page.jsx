@@ -614,7 +614,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       onClick={() => setSelectedDate(subDays(selectedDate, 1))}
-                      className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                      className="h-8 w-20 text-xs sm:text-sm sm:h-auto sm:w-auto dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
                       >
                       Previous Day
                     </Button>
@@ -629,7 +629,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       onClick={() => setSelectedDate(addDays(selectedDate, 1))}
-                      className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                      className="h-8 w-20 text-xs sm:text-sm sm:h-auto sm:w-auto dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
                     >
                       Next Day
                     </Button>
@@ -698,8 +698,8 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <Table>
-                    <TableHeader>
-                      <TableRow className="hover:bg-transparent">
+                    <TableHeader className = "">
+                      <TableRow className="hover:bg-transparent text-xs ">
                         <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Meal
                         </TableHead>
