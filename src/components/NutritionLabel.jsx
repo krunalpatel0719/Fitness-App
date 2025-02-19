@@ -42,55 +42,21 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
     setIsEditing(false);
     onClose();
   };
-
   useEffect(() => {
     if (food?.servings) {
       let servingsList = [...food.servings];
-
+  
       const gramBasedServing = servingsList.find(
         (s) =>
           (s.metric_serving_unit || "").toLowerCase() === "g" &&
           s.metric_serving_amount > 0
       );
-
-      // const hasGramServing = servingsList.some(s =>
-      //   s.description.toLowerCase().includes('gram') ||
-      //   (s.metric_serving_unit || '').toLowerCase() === 'g'
-      // );
-
-      // if (!hasGramServing) {
-
-      //   const baseServing = servingsList.find(s =>
-      //     (s.metric_serving_unit || '').toLowerCase() === 'g' &&
-      //     s.metric_serving_amount
-      //   );
-      //   if (baseServing) {
-      //     // Calculate per gram values
-      //     const conversionFactor = 1 / baseServing.metric_serving_amount;
-
-      //     // Create new "1 gram" serving option
-      //     const gramServing = {
-      //       serving_id: `gram_${Date.now()}`, // Unique ID
-      //       description: "1 gram",
-      //       calories: baseServing.calories * conversionFactor,
-      //       protein: baseServing.protein * conversionFactor,
-      //       carbs: baseServing.carbs * conversionFactor,
-      //       fat: baseServing.fat * conversionFactor,
-      //       metric_serving_amount: 1,
-      //       metric_serving_unit: 'g',
-      //       default: false
-      //     };
-
-      //     // Add the new serving option
-      //     servingsList.push(gramServing);
-      //   }
-      // }
-      // setServingsList(servingsList);
+  
       if (gramBasedServing) {
         // Calculate conversion factor to get per-gram values
         const gramsInServing = gramBasedServing.metric_serving_amount;
         const conversionFactor = 1 / gramsInServing;
-
+  
         // Create new 1 gram serving option
         const oneGramServing = {
           serving_id: "one_gram",
@@ -99,25 +65,41 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
           protein: gramBasedServing.protein * conversionFactor,
           carbs: gramBasedServing.carbs * conversionFactor,
           fat: gramBasedServing.fat * conversionFactor,
+          fiber: gramBasedServing.fiber * conversionFactor,
+          sugar: gramBasedServing.sugar * conversionFactor,
+          saturated_fat: gramBasedServing.saturated_fat * conversionFactor,
+          trans_fat: gramBasedServing.trans_fat * conversionFactor,
+          polyunsaturated_fat: gramBasedServing.polyunsaturated_fat * conversionFactor,
+          monounsaturated_fat: gramBasedServing.monounsaturated_fat * conversionFactor,
+          cholesterol: gramBasedServing.cholesterol * conversionFactor,
+          sodium: gramBasedServing.sodium * conversionFactor,
+          potassium: gramBasedServing.potassium * conversionFactor,
+          vitamin_a: gramBasedServing.vitamin_a * conversionFactor,
+          vitamin_c: gramBasedServing.vitamin_c * conversionFactor,
+          vitamin_d: gramBasedServing.vitamin_d * conversionFactor,
+          calcium: gramBasedServing.calcium * conversionFactor,
+          iron: gramBasedServing.iron * conversionFactor,
           metric_serving_amount: 1,
           metric_serving_unit: "g",
-          default: false,
+          default: false
         };
-
-        // Always add 1 gram option to the beginning of the list
+  
+        // Add 1 gram option to the beginning of the list
         servingsList.push(oneGramServing);
       }
-
+  
       setServingsList(servingsList);
-
+  
       // Find the originally selected serving for existing entries
       const initialServing = food.servingType
         ? servingsList.find((s) => s.description === food.servingType)
         : servingsList.find((s) => s.default) || servingsList[0];
-
-      setSelectedServing(initialServing);
-      setServingAmount(food.servingAmount || "1");
-      setSelectedMeal(food.mealType || "breakfast");
+  
+      if (initialServing) {
+        setSelectedServing(initialServing);
+        setServingAmount(food.servingAmount || "1");
+        setSelectedMeal(food.mealType || "breakfast");
+      }
     }
   }, [food]);
 
@@ -131,27 +113,33 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
 
   const handleSaveEntry = useCallback(() => {
     if (!selectedServing) return;
-
+  
     const entryData = {
       ...food,
       servingAmount,
       servingType: selectedServing.description,
-      calories: calculateNutrition(selectedServing.calories),
-      protein: calculateNutrition(selectedServing.protein),
-      carbs: calculateNutrition(selectedServing.carbs),
-      fat: calculateNutrition(selectedServing.fat),
       mealType: selectedMeal,
+      // Add base values for calculations
       baseCalories: selectedServing.calories,
       baseProtein: selectedServing.protein,
       baseCarbs: selectedServing.carbs,
       baseFat: selectedServing.fat,
+      baseServingUnit: selectedServing.metric_serving_unit || selectedServing.description,
+      baseServingAmount: selectedServing.metric_serving_amount || 1,
+      // Add calculated values
+      calories: calculateNutrition(selectedServing.calories),
+      protein: calculateNutrition(selectedServing.protein),
+      carbs: calculateNutrition(selectedServing.carbs),
+      fat: calculateNutrition(selectedServing.fat),
+      // Preserve the servings array for future edits
+      servings: food.servings
     };
-
+  
     if (isExistingEntry) {
       entryData.id = food.id;
       entryData.updatedAt = new Date();
     }
-
+  
     onEdit(entryData);
     setIsEditing(false);
     if (!isExistingEntry) onClose();
@@ -169,23 +157,23 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
   if (!isOpen || !food) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent hideClose={true} className="max-w-md dark:bg-zinc-800 max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={handleClose}  >
+      <DialogContent hideClose={true} className="w-10/12 max-w-sm sm:w-full sm:max-w-md dark:bg-zinc-800 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="dark:text-white text-xl md:text-2xl border-b-2 border-gray-700 w-full pb-1">
               Nutrition Facts
             </DialogTitle>
-            <DialogClose asChild>
-              <FiX className="h-5 w-5 dark:text-white hover:text-red-500" />
+            <DialogClose className = "ml-6 sm:ml-0" asChild>
+              <FiX className="h-7 w-7 sm:h-5 w-5 dark:text-white hover:text-red-500" />
             </DialogClose>
           </div>
-          <DialogDescription className="text-black dark:text-gray-300 text-lg font-bold">
+          <DialogDescription className="mr-12 sm:mr-0 text-black dark:text-gray-300 text-lg font-bold">
             {food?.food_name}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           {isEditing || !isExistingEntry ? (
             <>
               <div className="flex gap-4">
@@ -393,7 +381,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
                     className="bg-red-500 hover:bg-red-600 flex-1"
                     onClick={onDelete}
                   >
-                    <FiTrash2 className="mr-2" />
+                    <FiTrash2 className="mr-2"/>
                     Delete
                   </Button>
                 </div>
