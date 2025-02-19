@@ -7,10 +7,9 @@ export function AuthLayout({ children }) {
       <div className="mt-4 lg:mt-6">
         {children}
       </div>
-      <div className="absolute bottom-2 right-4 p-2 dark:text-white">
-        {/* <!-- Begin fatsecret Platform API HTML Attribution Snippet --> */}
+      <div className="mt-auto flex justify-end p-3 dark:text-white">
+     
         <a href="https://www.fatsecret.com">Powered by fatsecret</a>
-        {/* <!-- End fatsecret Platform API HTML Attribution Snippet --> */}
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export function ProfileDropdown() {
+export function ProfileDropdown({ hamburgerMode = false }) {
   const { currentUser } = useAuth();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
@@ -30,6 +30,7 @@ export function ProfileDropdown() {
     }
   };
 
+
   useEffect(() => {
     if (signingOut) {
       router.push("/signin");
@@ -40,20 +41,27 @@ export function ProfileDropdown() {
     return name?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'U';
   };
 
+  if (hamburgerMode) {
+    return null;
+  }
+  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative h-12 w-12 mt-4 rounded-full"
-        >
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={currentUser?.photoURL} alt={currentUser?.displayName} />
-            <AvatarFallback className="text-lg bg-gray-600 text-white">
-              {getInitials(currentUser?.displayName)}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+      <Button
+  variant="ghost"
+  className="relative h-10 w-10 md:mt-2 rounded-full" // Adjusted size
+>
+  <Avatar className="h-10 w-10"> 
+    <AvatarImage src={currentUser?.photoURL} alt={currentUser?.displayName} />
+    <AvatarFallback className="text-base bg-gray-600 text-white">
+      {getInitials(currentUser?.displayName)}
+    </AvatarFallback>
+  </Avatar>
+</Button>
+
+      
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mt-2 w-56 dark:bg-zinc-800" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">

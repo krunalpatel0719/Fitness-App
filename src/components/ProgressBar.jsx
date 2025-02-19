@@ -8,8 +8,12 @@ export function ProgressBar({ current, goal }) {
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
-        <span className="dark:text-gray-300  md:text-lg" >{current} kcal</span>
-        <span className="dark:text-gray-300  md:text-lg ">{goal} kcal</span>
+        <span className={`md:text-lg ${
+            isOver ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+          }`} >{current} kcal</span>
+        <span className={`md:text-lg ${
+            isOver ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+          }`}>{goal} kcal</span>
       </div>
       <div className="relative h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-zinc-600">
         <div
@@ -20,7 +24,7 @@ export function ProgressBar({ current, goal }) {
         />
       </div>
       {isOver && (
-        <div className="text-right text-sm text-red-500">
+        <div className="text-right text-sm text-red-600 dark:text-red-400">
           Exceeded by {current - goal} kcal
         </div>
       )}

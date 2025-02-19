@@ -39,7 +39,7 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
-import { format } from "date-fns";
+import { format, subDays, addDays } from "date-fns";
 import {
   Table,
   TableBody,
@@ -115,7 +115,7 @@ export default function Dashboard() {
   const [loadingFood, setLoadingFood] = useState(false);
   const [loadingFoodLog, setLoadingFoodLog] = useState(true);
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
-
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -146,13 +146,14 @@ export default function Dashboard() {
     };
 
     // Realtime listener for today's food log
-    const today = format(new Date(), "yyyy-MM-dd");
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
     const q = query(
       collection(db, "food_logs"),
       where("userId", "==", currentUser.uid),
-      where("date", "==", today),
+      where("date", "==", dateStr),
       orderBy("createdAt", "desc")
     );
+  
 
     const unsubscribe = onSnapshot(
       q,
@@ -178,7 +179,7 @@ export default function Dashboard() {
       loadMetrics();
     }
     return () => unsubscribe();
-  }, [currentUser, userLoggedIn, router]);
+  }, [currentUser, userLoggedIn, selectedDate]);
 
   const calculateCalories = (metrics) => {
 
@@ -417,7 +418,7 @@ export default function Dashboard() {
         servingAmount: "1",
         servingType: serving.description,
         mealType: selectedMeal,
-        date: format(new Date(), "yyyy-MM-dd"),
+        date: format(selectedDate, "yyyy-MM-dd"),
         createdAt: new Date(),
       };
   
@@ -449,7 +450,7 @@ export default function Dashboard() {
         baseProtein: foodData.baseProtein,
         baseCarbs: foodData.baseCarbs,
         baseFat: foodData.baseFat,
-        date: format(new Date(), "yyyy-MM-dd"),
+        date: format(selectedDate, "yyyy-MM-dd"),
         createdAt: new Date()
       });
     } catch (error) {
@@ -607,15 +608,44 @@ export default function Dashboard() {
             </div>
           ) : (
             <>
+            <Card className="dark:bg-zinc-800">
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <Button
+                      variant="outline"
+                      onClick={() => setSelectedDate(subDays(selectedDate, 1))}
+                      className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                      >
+                      Previous Day
+                    </Button>
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg md:text-2xl font-semibold dark:text-white">
+                        {format(selectedDate, "EEEE")}
+                      </span>
+                      <span className="text-sm md:text-md dark:text-gray-300">
+                        {format(selectedDate, "MMMM d, yyyy")}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => setSelectedDate(addDays(selectedDate, 1))}
+                      className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                    >
+                      Next Day
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
               <div className="grid gap-4 md:grid-cols-2">
+              
                 <Card className="dark:bg-zinc-800">
                   <CardHeader>
-                    <CardTitle className="dark:text-white text-lg md:text-xl">
+                    <CardTitle className="text-gray-800 dark:text-white text-lg md:text-xl">
                       Daily Goal
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold dark:text-blue-400 md:text-4xl">
+                    <div className="text-3xl font-bold text-blue-400 md:text-4xl">
                       {userMetrics.dailyCalories}
                       <span className="text-sm ml-2 dark:text-gray-300 md:text-base">
                         kcal
@@ -625,7 +655,7 @@ export default function Dashboard() {
                 </Card>
                 <Card className="dark:bg-zinc-800">
                   <CardHeader>
-                    <CardTitle className="dark:text-white md:text-xl">
+                    <CardTitle className="text-gray-800 dark:text-white md:text-xl">
                       Daily Progress
                     </CardTitle>
                   </CardHeader>
@@ -640,7 +670,7 @@ export default function Dashboard() {
 
               <Card className="dark:bg-zinc-800">
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="dark:text-white md:text-xl">
+                  <CardTitle className="text-gray-800 dark:text-white text-lg md:text-xl">
                     Food Diary
                   </CardTitle>
                   <div className="flex gap-2">
@@ -670,19 +700,19 @@ export default function Dashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="dark:text-gray-300 text-center md:text-lg">
+                        <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Meal
                         </TableHead>
-                        <TableHead className="dark:text-gray-300 text-center md:text-lg">
+                        <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Food
                         </TableHead>
-                        <TableHead className="dark:text-gray-300 text-center md:text-lg">
+                        <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Serving
                         </TableHead>
-                        <TableHead className="dark:text-gray-300 text-center md:text-lg">
+                        <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Calories
                         </TableHead>
-                        <TableHead className="dark:text-gray-300 text-center md:text-lg">
+                        <TableHead className="text-gray-800 dark:text-gray-300 text-center md:text-lg">
                           Info
                         </TableHead>
                       </TableRow>
@@ -699,7 +729,7 @@ export default function Dashboard() {
                                 <TableCell>
                                   <Skeleton className="h-4 w-[120px]" />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell> 
                                   <Skeleton className="h-4 w-[80px]" />
                                 </TableCell>
                                 <TableCell>
@@ -730,7 +760,7 @@ export default function Dashboard() {
                               <TableCell className="text-center">
                                 <div className="flex justify-center items-center h-full">
                                 <CiCircleInfo
-                                  className="h-5 w-5 dark:text-white md:h-7 md:w-7 cursor-pointer hover:text-blue-500 transition-colors"
+                                  className="h-5 w-5 dark:text-gray-100 md:h-7 md:w-7 cursor-pointer hover:text-blue-500 transition-colors"
                                   onClick={async () => {
                                     try {
                                       if (!entry.food_id) {
@@ -870,7 +900,8 @@ export default function Dashboard() {
                           variant="outline"
                           onClick={() => handleSearch(currentPage - 1)}
                           disabled={currentPage === 1}
-                        >
+                          className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                       >
                           Previous
                         </Button>
                         <span className="px-4 py-2 text-gray-600 dark:text-gray-300">
@@ -880,6 +911,8 @@ export default function Dashboard() {
                           variant="outline"
                           onClick={() => handleSearch(currentPage + 1)}
                           disabled={currentPage === totalPages}
+                          className="dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
+                       
                         >
                           Next
                         </Button>
@@ -923,8 +956,8 @@ export default function Dashboard() {
           )}
         </div>
       </main>
-      <div className="absolute bottom-2 right-4 p-2 dark:text-white">
-        {/* Fatsecret attribution snippet */}
+      <div className="mt-auto flex justify-end p-3 dark:text-white">
+     
         <a href="https://www.fatsecret.com">Powered by fatsecret</a>
       </div>
     </div>
