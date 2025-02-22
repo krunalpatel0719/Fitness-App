@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/Navbar";
@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import { format } from "date-fns";
-
+import { LuDumbbell } from "react-icons/lu";
 import { MetricsSection } from "@/components/MetricsSection";
 import { FoodDiary } from "@/components/FoodDiary";
 
@@ -257,6 +257,11 @@ export default function Dashboard() {
     return `${numericAmount} ${pluralize(type)}`;
   };
 
+  const handleDailyTotalInfo = (totalNutrition) => {
+    setSelectedFood(totalNutrition);
+    setIsNutritionLabelOpen(true);
+  };
+
   const handleFoodSelection = async (foodId) => {
     try {
       const response = await fetch(`/api/foods?id=${foodId}`);
@@ -313,6 +318,22 @@ export default function Dashboard() {
         protein: foodData.protein,
         carbs: foodData.carbs,
         fat: foodData.fat,
+        fiber: foodData.fiber,
+        sugar: foodData.sugar,
+        saturated_fat: foodData.saturated_fat,
+        trans_fat: foodData.trans_fat,
+        polyunsaturated_fat: foodData.polyunsaturated_fat,
+        monounsaturated_fat: foodData.monounsaturated_fat,
+        cholesterol: foodData.cholesterol,
+        sodium: foodData.sodium,
+        potassium: foodData.potassium,
+        vitamin_a: foodData.vitamin_a,
+        vitamin_c: foodData.vitamin_c,
+        vitamin_d: foodData.vitamin_d,
+        calcium: foodData.calcium,
+        iron: foodData.iron,
+        
+
         servingSize: foodData.servingType,
         servingAmount: foodData.servingAmount,
         servingType: foodData.servingType,
@@ -321,6 +342,20 @@ export default function Dashboard() {
         baseProtein: foodData.baseProtein,
         baseCarbs: foodData.baseCarbs,
         baseFat: foodData.baseFat,
+        baseFiber: foodData.baseFiber,
+        baseSugar: foodData.baseSugar,
+        baseSaturatedFat: foodData.baseSaturatedFat,
+        baseTransFat: foodData.baseTransFat,
+        basePolyunsaturatedFat: foodData.basePolyunsaturatedFat,
+        baseMonounsaturatedFat: foodData.baseMonounsaturatedFat,
+        baseCholesterol: foodData.baseCholesterol,
+        baseSodium: foodData.baseSodium,
+        basePotassium: foodData.basePotassium,
+        baseVitaminA: foodData.baseVitaminA,
+        baseVitaminC: foodData.baseVitaminC,
+        baseVitaminD: foodData.baseVitaminD,
+        baseCalcium: foodData.baseCalcium,
+        baseIron: foodData.baseIron,
         baseServingUnit: foodData.baseServingUnit,
         baseServingAmount: foodData.baseServingAmount,
         date: format(selectedDate, "yyyy-MM-dd"),
@@ -337,7 +372,21 @@ export default function Dashboard() {
       const protein = Math.round(Number(serving.protein)) || 0;
       const carbs = Math.round(Number(serving.carbs)) || 0;
       const fat = Math.round(Number(serving.fat)) || 0;
-  
+      const fiber = Math.round(Number(serving.fiber)) || 0;
+      const sugar = Math.round(Number(serving.sugar)) || 0;
+      const saturated_fat = Math.round(Number(serving.saturated_fat)) || 0;
+      const trans_fat = Math.round(Number(serving.trans_fat)) || 0;
+      const polyunsaturated_fat = Math.round(Number(serving.polyunsaturated_fat)) || 0;
+      const monounsaturated_fat = Math.round(Number(serving.monounsaturated_fat)) || 0;
+      const cholesterol = Math.round(Number(serving.cholesterol)) || 0;
+      const sodium = Math.round(Number(serving.sodium)) || 0;
+      const potassium = Math.round(Number(serving.potassium)) || 0;
+      const vitamin_a = Math.round(Number(serving.vitamin_a)) || 0;
+      const vitamin_c = Math.round(Number(serving.vitamin_c)) || 0;
+      const vitamin_d = Math.round(Number(serving.vitamin_d)) || 0;
+      const calcium = Math.round(Number(serving.calcium)) || 0;
+      const iron = Math.round(Number(serving.iron)) || 0;
+
       const foodLogEntry = {
         userId: currentUser.uid,
         foodName: food.food_name,
@@ -347,6 +396,20 @@ export default function Dashboard() {
         protein: protein,
         carbs: carbs,
         fat: fat,
+        fiber: fiber,
+        sugar: sugar,
+        saturated_fat: saturated_fat,
+        trans_fat: trans_fat,
+        polyunsaturated_fat: polyunsaturated_fat,
+        monounsaturated_fat: monounsaturated_fat,
+        cholesterol: cholesterol,
+        sodium: sodium,
+        potassium: potassium,
+        vitamin_a: vitamin_a,
+        vitamin_c: vitamin_c,
+        vitamin_d: vitamin_d,
+        calcium: calcium,
+        iron: iron,
         servingSize: formatServing(serving),
         servingAmount: "1",
         servingType: serving.description,
@@ -354,7 +417,6 @@ export default function Dashboard() {
         date: format(selectedDate, "yyyy-MM-dd"),
         createdAt: new Date(),
       };
-  
       await addDoc(collection(db, "food_logs"), foodLogEntry);
       // setSearchResults([]);
       // setNewFood("");
@@ -365,32 +427,6 @@ export default function Dashboard() {
   };
 
 
-  // const handleAddFoodWithServing = async (foodData) => {
-  //   try {
-  //     await addDoc(collection(db, "food_logs"), {
-  //       userId: currentUser.uid,
-  //       foodName: foodData.food_name,
-  //       food_id: foodData.food_id, 
-  //       calories: foodData.calories,
-  //       protein: foodData.protein,
-  //       carbs: foodData.carbs,
-  //       fat: foodData.fat,
-  //       servingSize: foodData.servingType,
-  //       servingAmount: foodData.servingAmount,
-  //       servingType: foodData.servingType,
-  //       mealType: foodData.mealType,
-  //       baseCalories: foodData.baseCalories,
-  //       baseProtein: foodData.baseProtein,
-  //       baseCarbs: foodData.baseCarbs,
-  //       baseFat: foodData.baseFat,
-  //       date: format(selectedDate, "yyyy-MM-dd"),
-  //       createdAt: new Date()
-  //     });
-  //   } catch (error) {
-  //     console.error("Add food error:", error);
-  //     alert("Failed to save food entry");
-  //   }
-  // };
   
   const handleEditFood = async (updatedFood) => {
     try {
@@ -403,27 +439,86 @@ export default function Dashboard() {
         protein: updatedFood.baseProtein,
         carbs: updatedFood.baseCarbs,
         fat: updatedFood.baseFat,
+        fiber: updatedFood.baseFiber,
+        sugar: updatedFood.baseSugar,
+        saturated_fat: updatedFood.baseSaturatedFat,
+        trans_fat: updatedFood.baseTransFat,
+        polyunsaturated_fat: updatedFood.basePolyunsaturatedFat,
+        monounsaturated_fat: updatedFood.baseMonounsaturatedFat,
+        cholesterol: updatedFood.baseCholesterol,
+        sodium: updatedFood.baseSodium,
+        potassium: updatedFood.basePotassium,
+        vitamin_a: updatedFood.baseVitaminA,
+        vitamin_c: updatedFood.baseVitaminC,
+        vitamin_d: updatedFood.baseVitaminD,
+        calcium: updatedFood.baseCalcium,
+        iron: updatedFood.baseIron,
+        
         description: updatedFood.servingType
       };
-  
+      
+      const calculateNutrition = (baseValue) => {
+        const amount = parseFloat(updatedFood.servingAmount) || 1;
+        return Math.round(baseValue * amount);
+      };
+
       const updatedData = {
         foodName: updatedFood.food_name,
         food_id: updatedFood.food_id,
-        calories: Math.round(Number(selectedServing.calories) * parseFloat(updatedFood.servingAmount)),
-        protein: Math.round(Number(selectedServing.protein) * parseFloat(updatedFood.servingAmount)),
-        carbs: Math.round(Number(selectedServing.carbs) * parseFloat(updatedFood.servingAmount)),
-        fat: Math.round(Number(selectedServing.fat) * parseFloat(updatedFood.servingAmount)),
+        // calories: Math.round(Number(selectedServing.calories) * parseFloat(updatedFood.servingAmount)),
+        // protein: Math.round(Number(selectedServing.protein) * parseFloat(updatedFood.servingAmount)),
+        // carbs: Math.round(Number(selectedServing.carbs) * parseFloat(updatedFood.servingAmount)),
+        // fat: Math.round(Number(selectedServing.fat) * parseFloat(updatedFood.servingAmount)),
+
+        calories: calculateNutrition(selectedServing.calories),
+        protein: calculateNutrition(selectedServing.protein),
+        carbs: calculateNutrition(selectedServing.carbs),
+        fat: calculateNutrition(selectedServing.fat),
+        fiber: calculateNutrition(selectedServing.fiber),
+        sugar: calculateNutrition(selectedServing.sugar),
+        saturated_fat: calculateNutrition(selectedServing.saturated_fat),
+        trans_fat: calculateNutrition(selectedServing.trans_fat),
+        polyunsaturated_fat: calculateNutrition(selectedServing.polyunsaturated_fat),
+        monounsaturated_fat: calculateNutrition(selectedServing.monounsaturated_fat),
+        cholesterol: calculateNutrition(selectedServing.cholesterol),
+        sodium: calculateNutrition(selectedServing.sodium),
+        potassium: calculateNutrition(selectedServing.potassium),
+        vitamin_a: calculateNutrition(selectedServing.vitamin_a),
+        vitamin_c: calculateNutrition(selectedServing.vitamin_c),
+        vitamin_d: calculateNutrition(selectedServing.vitamin_d),
+        calcium: calculateNutrition(selectedServing.calcium),
+        iron: calculateNutrition(selectedServing.iron),
+
         servingAmount: updatedFood.servingAmount,
         servingType: updatedFood.servingType,
         mealType: updatedFood.mealType,
         updatedAt: new Date(),
-        // Store base values
+      
         baseCalories: selectedServing.calories,
         baseProtein: selectedServing.protein,
         baseCarbs: selectedServing.carbs,
         baseFat: selectedServing.fat,
+        baseCalories: selectedServing.calories,
+        baseProtein: selectedServing.protein,
+        baseCarbs: selectedServing.carbs,
+        baseFat: selectedServing.fat,
+        baseFiber: selectedServing.fiber,
+        baseSugar: selectedServing.sugar,
+        baseSaturatedFat: selectedServing.saturated_fat,
+        baseTransFat: selectedServing.trans_fat,
+        basePolyunsaturatedFat: selectedServing.polyunsaturated_fat,
+        baseMonounsaturatedFat: selectedServing.monounsaturated_fat,
+        baseCholesterol: selectedServing.cholesterol,
+        baseSodium: selectedServing.sodium,
+        basePotassium: selectedServing.potassium,
+        baseVitaminA: selectedServing.vitamin_a,
+        baseVitaminC: selectedServing.vitamin_c,
+        baseVitaminD: selectedServing.vitamin_d,
+        baseCalcium: selectedServing.calcium,
+        baseIron: selectedServing.iron,
         baseServingUnit: selectedServing.metric_serving_unit || selectedServing.description,
-        baseServingAmount: selectedServing.metric_serving_amount || 1
+        baseServingAmount: selectedServing.metric_serving_amount || 1,
+       
       };
   
       await updateDoc(doc(db, "food_logs", updatedFood.id), updatedData);
@@ -509,10 +604,10 @@ export default function Dashboard() {
   if (!userLoggedIn) return null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-zinc-900">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
       <Navbar />
-      <main className="flex-1 p-4 md:p-8">
-        <div className="container max-w-4xl space-y-6 mx-auto">
+      <main className="border-0 flex-1 p-6 lg:p-8">
+        <div className="container max-w-6xl space-y-8 mx-auto">
           {loadingMetrics ? (
             <div className="max-w-md mx-auto">
               <Skeleton className="h-8 w-full" />
@@ -529,6 +624,8 @@ export default function Dashboard() {
                 setSelectedDate={setSelectedDate}
                 userMetrics={userMetrics}
                 caloriesConsumed={caloriesConsumed}
+                foodEntries={foodEntries}
+                onInfoClick={handleDailyTotalInfo}
               />
               <FoodDiary
                 selectedMeal={selectedMeal}

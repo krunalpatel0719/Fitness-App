@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { HiMenu } from "react-icons/hi";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { LuDumbbell } from "react-icons/lu";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,21 +22,26 @@ export function Navbar() {
   ];
 
   return (
-    <header className="top-0 z-50 w-full bg-white dark:bg-zinc-900 shadow-sm">
+    
+    <header className="top-0 z-50 w-full  bg-white dark:bg-zinc-800 shadow-lg pb-1">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo and Desktop Navigation */}
-        <div className="flex items-center space-x-8">
-          <h1 className="text-xl md:text-2xl font-bold leading-none bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Krunal's Fitness App
-          </h1>
+        <div className="flex items-center space-x-4 lg:space-x-6 pt-1">
+          <div className="flex items-center">
+              <LuDumbbell className="h-8 w-8 text-blue-500" />
+                <h1 className="pl-4 text-lg md:text-xl font-bold leading-none bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Krunal's Fitness App
+                </h1>
+             
+            </div>
 
           {/* Desktop Navigation - vertically centered with logo */}
-          <nav className="hidden md:flex pl-2 items-center space-x-10">
+          <nav className="hidden font-medium md:flex pl-2 items-center space-x-4 lg:space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-lg mt-2 font-medium transition-colors ${
+                className={`text-md font-medium transition-colors ${
                   pathname === item.href
                     ? "text-blue-600 dark:text-blue-500"
                     : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-500"
@@ -48,7 +54,7 @@ export function Navbar() {
         </div>
 
         {/* Profile Dropdown (desktop only) and Mobile Menu Button */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 pt-1">
           <div className="hidden md:block">
             <ProfileDropdown />
           </div>
@@ -82,15 +88,13 @@ export function Navbar() {
 
           {/* Settings and Sign Out */}
           <div className=" dark:border-zinc-700 ">
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                router.push("/settings");
-              }}
+            <Link
+              href="/settings"
               className="block w-full text-left py-2 text-sm font-medium text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-500"
+              onClick={() => setIsMenuOpen(false)}
             >
               Settings
-            </button>
+            </Link>
             <button
               onClick={async () => {
                 setIsMenuOpen(false);

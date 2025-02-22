@@ -4,6 +4,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -99,13 +100,19 @@ export function SignUpForm({ className, ...props }) {
             </div>
             <div className="mt-4 text-center text-sm dark:text-gray-300">
               Already have an account?{" "}
-              <Button
+              <Link
+                href="/signin"
+                 className="underline underline-offset-4 dark:text-blue-400 p-0"
+              >
+                Sign In
+              </Link>
+              {/* <Button
                 variant="link"
                 className="underline underline-offset-4 dark:text-blue-400 p-0"
                 onClick={() => router.push("/signin")}
               >
                 Sign In
-              </Button>
+              </Button> */}
             </div>
           </form>
         </CardContent>

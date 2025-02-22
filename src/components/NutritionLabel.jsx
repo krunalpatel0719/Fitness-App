@@ -32,6 +32,9 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
 
   const isExistingEntry = !!food?.id;
   const [servingsList, setServingsList] = useState([]);
+
+  const isDailyTotal = food?.mealType === "daily total";
+
   useEffect(() => {
     if (!isOpen) {
       setIsEditing(false);
@@ -81,7 +84,29 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
           iron: gramBasedServing.iron * conversionFactor,
           metric_serving_amount: 1,
           metric_serving_unit: "g",
-          default: false
+          default: false,
+
+          baseCalories: gramBasedServing.calories,
+          baseProtein: gramBasedServing.protein,
+          baseCarbs: gramBasedServing.carbs,
+          baseFat: gramBasedServing.fat,
+          baseFiber: gramBasedServing.fiber,
+          baseSugar: gramBasedServing.sugar,
+          baseSaturatedFat: gramBasedServing.saturated_fat,
+          baseTransFat: gramBasedServing.trans_fat,
+          basePolyunsaturatedFat: gramBasedServing.polyunsaturated_fat,
+          baseMonounsaturatedFat: gramBasedServing.monounsaturated_fat,
+          baseCholesterol: gramBasedServing.cholesterol,
+          baseSodium: gramBasedServing.sodium,
+          basePotassium: gramBasedServing.potassium,
+          baseVitaminA: gramBasedServing.vitamin_a,
+          baseVitaminC: gramBasedServing.vitamin_c,
+          baseVitaminD: gramBasedServing.vitamin_d,
+          baseCalcium: gramBasedServing.calcium,
+          baseIron: gramBasedServing.iron,
+
+
+
         };
   
         // Add 1 gram option to the beginning of the list
@@ -120,17 +145,46 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
       servingType: selectedServing.description,
       mealType: selectedMeal,
       // Add base values for calculations
-      baseCalories: selectedServing.calories,
-      baseProtein: selectedServing.protein,
-      baseCarbs: selectedServing.carbs,
-      baseFat: selectedServing.fat,
+      baseCalories: selectedServing.calories || 0,
+      baseProtein: selectedServing.protein || 0,
+      baseCarbs: selectedServing.carbs || 0,
+      baseFat: selectedServing.fat || 0,
+      baseFiber: selectedServing.fiber || 0,
+      baseSugar: selectedServing.sugar || 0,
+      baseSaturatedFat: selectedServing.saturated_fat || 0,
+      baseTransFat: selectedServing.trans_fat || 0,
+      basePolyunsaturatedFat: selectedServing.polyunsaturated_fat || 0,
+      baseMonounsaturatedFat: selectedServing.monounsaturated_fat || 0,
+      baseCholesterol: selectedServing.cholesterol || 0,
+      baseSodium: selectedServing.sodium || 0,
+      basePotassium: selectedServing.potassium || 0,
+      baseVitaminA: selectedServing.vitamin_a || 0,
+      baseVitaminC: selectedServing.vitamin_c || 0,
+      baseVitaminD: selectedServing.vitamin_d || 0,
+      baseCalcium: selectedServing.calcium || 0,
+      baseIron: selectedServing.iron || 0,
       baseServingUnit: selectedServing.metric_serving_unit || selectedServing.description,
       baseServingAmount: selectedServing.metric_serving_amount || 1,
       // Add calculated values
-      calories: calculateNutrition(selectedServing.calories),
-      protein: calculateNutrition(selectedServing.protein),
-      carbs: calculateNutrition(selectedServing.carbs),
-      fat: calculateNutrition(selectedServing.fat),
+      calories: calculateNutrition(selectedServing.calories || 0),
+      protein: calculateNutrition(selectedServing.protein || 0),
+      carbs: calculateNutrition(selectedServing.carbs || 0),
+      fat: calculateNutrition(selectedServing.fat || 0),
+      fiber: calculateNutrition(selectedServing.fiber || 0),
+      sugar: calculateNutrition(selectedServing.sugar || 0),
+      saturated_fat: calculateNutrition(selectedServing.saturated_fat || 0),
+      trans_fat: calculateNutrition(selectedServing.trans_fat || 0),
+      polyunsaturated_fat: calculateNutrition(selectedServing.polyunsaturated_fat || 0),
+      monounsaturated_fat: calculateNutrition(selectedServing.monounsaturated_fat || 0),
+      cholesterol: calculateNutrition(selectedServing.cholesterol || 0),
+      sodium: calculateNutrition(selectedServing.sodium || 0),
+      potassium: calculateNutrition(selectedServing.potassium || 0),
+      vitamin_a: calculateNutrition(selectedServing.vitamin_a || 0),
+      vitamin_c: calculateNutrition(selectedServing.vitamin_c || 0),
+      vitamin_d: calculateNutrition(selectedServing.vitamin_d || 0),
+      calcium: calculateNutrition(selectedServing.calcium || 0),
+      iron: calculateNutrition(selectedServing.iron || 0),
+      
       // Preserve the servings array for future edits
       servings: food.servings
     };
@@ -162,7 +216,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="dark:text-white text-xl md:text-2xl border-b-2 border-gray-700 w-full pb-1">
-              Nutrition Facts
+              {isDailyTotal ? "Daily Total" : "Nutrition Facts"}
             </DialogTitle>
             <DialogClose className = "ml-6 sm:ml-0" asChild>
               <FiX className="h-7 w-7 sm:h-5 w-5 dark:text-white hover:text-red-500" />
@@ -174,8 +228,9 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
         </DialogHeader>
 
         <div className="space-y-4 ">
-          {isEditing || !isExistingEntry ? (
+          {isEditing && !isDailyTotal || !isExistingEntry && !isDailyTotal  ? (
             <>
+            
               <div className="flex gap-4">
                 <Input
                   type="number"
@@ -227,6 +282,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
               </Select>
             </>
           ) : (
+            !isDailyTotal ? (
             // View mode content
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -242,6 +298,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
                 </span>
               </div>
             </div>
+            ) : ( <></>)
           )}
         </div>
 
@@ -350,52 +407,56 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
         </div>
 
         <DialogFooter className="pt-4">
-          {isExistingEntry ? (
-            <>
-              {isEditing ? (
-                <div className="flex gap-2 w-full">
-                  <Button
-                    onClick={() => setIsEditing(false)}
-                    className="bg-red-500 hover:bg-red-600 flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSaveEntry}
-                    className="bg-emerald-600 hover:bg-emerald-700 flex-1"
-                  >
-                    Save Changes
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex gap-2 w-full">
-                  <Button
-                    className="bg-gray-500 hover:bg-gray-600 flex-1"
-                    variant=""
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <FiEdit2 className="mr-2" />
-                    Edit Entry
-                  </Button>
-                  <Button
-                    className="bg-red-500 hover:bg-red-600 flex-1"
-                    onClick={onDelete}
-                  >
-                    <FiTrash2 className="mr-2"/>
-                    Delete
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="w-full">
-              <Button onClick={handleSaveEntry} className="w-full">
-                Add Entry
-              </Button>
-            </div>
+          {!isDailyTotal && (
+            isExistingEntry ? (
+              <>
+                {isEditing ? (
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      onClick={() => setIsEditing(false)}
+                      className="bg-red-500 hover:bg-red-600 flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleSaveEntry}
+                      className="bg-emerald-600 hover:bg-emerald-700 flex-1"
+                    >
+                      Save Changes
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      className="bg-gray-500 hover:bg-gray-600 flex-1"
+                      variant=""
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <FiEdit2 className="mr-2" />
+                      Edit Entry
+                    </Button>
+                    <Button
+                      className="bg-red-500 hover:bg-red-600 flex-1"
+                      onClick={onDelete}
+                    >
+                      <FiTrash2 className="mr-2"/>
+                      Delete
+                    </Button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full">
+                <Button onClick={handleSaveEntry} className="w-full">
+                  Add Entry
+                </Button>
+              </div>
+            )
           )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
+

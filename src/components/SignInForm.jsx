@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -140,13 +141,13 @@ export function SignInForm() {
 
             <div className="mt-4 text-center text-sm dark:text-gray-300">
               Don't have an account?{" "}
-              <Button
-                variant="link"
-                className="underline underline-offset-4 dark:text-blue-400 p-0"
-                onClick={() => router.push("/signup")}
+              <Link
+                href="/signup"
+                 className="underline underline-offset-4 dark:text-blue-400 p-0"
               >
                 Sign Up
-              </Button>
+              </Link>
+              
             </div>
           </CardContent>
         </Card>

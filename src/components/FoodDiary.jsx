@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FiX } from "react-icons/fi";
 import { CiCircleInfo } from "react-icons/ci";
 import { NutritionLabel } from "@/components/NutritionLabel";
-
+import { LuInfo, LuPlus, LuSearch } from "react-icons/lu"
 export function FoodDiary({
   selectedMeal,
   setSelectedMeal,
@@ -38,13 +38,85 @@ export function FoodDiary({
   
   // Note: handleAddFoodWithServing should be passed if used inside NutritionLabel.onEdit
 }) {
+
+  const handleInfoClick = async (entry) => {
+   
+    try {
+      if (!entry.food_id) {
+        // If no food_id, show the entry data as is
+        
+        setSelectedFood({
+          id: entry.id,
+          food_name: entry.foodName,
+          servingAmount: entry.servingAmount,
+          servingType: entry.servingType,
+          mealType: entry.mealType,
+          calories: entry.calories,
+          protein: entry.protein,
+          carbs: entry.carbs,
+          fat: entry.fat,
+          servings: [
+            {
+              description: entry.servingType,
+              calories: entry.baseCalories || entry.calories,
+              protein: entry.baseProtein || entry.protein,
+              carbs: entry.baseCarbs || entry.carbs,
+              fat: entry.baseFat || entry.fat,
+            },
+          ],
+        });
+        setIsNutritionLabelOpen(true);
+        return;
+      }
+      const response = await fetch(`/api/foods?id=${entry.food_id}`);
+      if (!response.ok) throw new Error("Food lookup failed");
+      const data = await response.json();
+      if (data.food) {
+        setSelectedFood({
+          ...data.food,
+          id: entry.id,
+          food_id: entry.food_id,
+          servingAmount: entry.servingAmount,
+          servingType: entry.servingType,
+          mealType: entry.mealType,
+          calories: entry.calories,
+          protein: entry.protein,
+          carbs: entry.carbs,
+          fat: entry.fat,
+        });
+        setIsNutritionLabelOpen(true);
+      }
+    } catch (error) {
+      console.error("Error fetching food details:", error);
+      setSelectedFood({
+        id: entry.id,
+        food_name: entry.foodName,
+        servingAmount: entry.servingAmount,
+        servingType: entry.servingType,
+        mealType: entry.mealType,
+        calories: entry.calories,
+        protein: entry.protein,
+        carbs: entry.carbs,
+        fat: entry.fat,
+        servings: [
+          {
+            description: entry.servingType,
+            calories: entry.baseCalories || entry.calories,
+            protein: entry.baseProtein || entry.protein,
+            carbs: entry.baseCarbs || entry.carbs,
+            fat: entry.baseFat || entry.fat,
+          },
+        ],
+      });
+      setIsNutritionLabelOpen(true);
+    }
+  };
+
   return (
-    <Card className="dark:bg-zinc-800">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-gray-800 dark:text-white text-lg md:text-xl">
-          Food Diary
-        </CardTitle>
-        <div className="flex gap-2">
+    <Card className="bg-white dark:bg-zinc-800 shadow-md border-0">
+      <CardHeader className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <CardTitle className="text-2xl font-bold dark:text-white">Food Diary</CardTitle>
+        <div className="flex flex-wrap gap-2">
                     <MealButton
                       meal="breakfast"
                       selected={selectedMeal}
@@ -70,10 +142,10 @@ export function FoodDiary({
        
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-auto rounded-lg border dark:border-zinc-900">
           <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent text-xs">
+            <TableHeader className="bg-gray-100 dark:bg-zinc-900 border-b-2 dark:border-zinc-900">
+              <TableRow className="hover:bg-transparent text-xs ">
                 <TableHead className="text-gray-800 dark:text-gray-300 text-center sm:text-sm md:text-lg w-[20%] p-2">
                   Meal
                 </TableHead>
@@ -91,7 +163,7 @@ export function FoodDiary({
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="hover:bg-transparent">
+            <TableBody className="hover:bg-transparent ">
               {loadingFoodLog
                 ? Array(3)
                     .fill(0)
@@ -115,94 +187,25 @@ export function FoodDiary({
                       </TableRow>
                     ))
                 : foodEntries.map((entry) => (
-                    <TableRow key={entry.id} className="hover:bg-transparent">
-                      <TableCell className="dark:text-gray-100 md:text-lg capitalize text-center p-2 text-xs sm:text-sm">
+                    <TableRow key={entry.id} className="hover:bg-transparent  border-b dark:border-zinc-900">
+                      <TableCell className="dark:text-gray-300 md:text-lg capitalize text-center p-2 text-xs sm:text-sm">
                         {entry.mealType}
                       </TableCell>
-                      <TableCell className="dark:text-gray-100 md:text-lg text-center p-2 text-xs sm:text-sm break-words">
+                      <TableCell className="dark:text-gray-300 md:text-lg text-center p-2 text-xs sm:text-sm break-words">
                         {entry.foodName}
                       </TableCell>
-                      <TableCell className="dark:text-gray-100 md:text-lg text-center capitalize p-2 text-xs sm:text-sm break-words">
+                      <TableCell className="dark:text-gray-300 md:text-lg text-center capitalize p-2 text-xs sm:text-sm break-words">
                         {formatServingDisplay(entry.servingAmount, entry.servingType)}
                       </TableCell>
-                      <TableCell className="dark:text-gray-100 md:text-lg text-center p-2 text-xs sm:text-sm">
+                      <TableCell className="dark:text-gray-300 md:text-lg text-center p-2 text-xs sm:text-sm">
                         {entry.calories}
                       </TableCell>
-                      <TableCell className="text-center p-2">
-                        <div className="flex justify-center items-center h-full">
-                          <CiCircleInfo
-                            className="h-4 w-4 sm:h-5 sm:w-5 dark:text-gray-100 md:h-7 md:w-7 cursor-pointer hover:text-blue-500 transition-colors"
-                            onClick={async () => {
-                              try {
-                                if (!entry.food_id) {
-                                  // If no food_id, show the entry data as is
-                                  setSelectedFood({
-                                    id: entry.id,
-                                    food_name: entry.foodName,
-                                    servingAmount: entry.servingAmount,
-                                    servingType: entry.servingType,
-                                    mealType: entry.mealType,
-                                    calories: entry.calories,
-                                    protein: entry.protein,
-                                    carbs: entry.carbs,
-                                    fat: entry.fat,
-                                    servings: [
-                                      {
-                                        description: entry.servingType,
-                                        calories: entry.baseCalories || entry.calories,
-                                        protein: entry.baseProtein || entry.protein,
-                                        carbs: entry.baseCarbs || entry.carbs,
-                                        fat: entry.baseFat || entry.fat,
-                                      },
-                                    ],
-                                  });
-                                  setIsNutritionLabelOpen(true);
-                                  return;
-                                }
-                                const response = await fetch(`/api/foods?id=${entry.food_id}`);
-                                if (!response.ok) throw new Error("Food lookup failed");
-                                const data = await response.json();
-                                if (data.food) {
-                                  setSelectedFood({
-                                    ...data.food,
-                                    id: entry.id,
-                                    food_id: entry.food_id,
-                                    servingAmount: entry.servingAmount,
-                                    servingType: entry.servingType,
-                                    mealType: entry.mealType,
-                                    calories: entry.calories,
-                                    protein: entry.protein,
-                                    carbs: entry.carbs,
-                                    fat: entry.fat,
-                                  });
-                                  setIsNutritionLabelOpen(true);
-                                }
-                              } catch (error) {
-                                console.error("Error fetching food details:", error);
-                                // Fallback to existing entry data
-                                setSelectedFood({
-                                  id: entry.id,
-                                  food_name: entry.foodName,
-                                  servingAmount: entry.servingAmount,
-                                  servingType: entry.servingType,
-                                  mealType: entry.mealType,
-                                  calories: entry.calories,
-                                  protein: entry.protein,
-                                  carbs: entry.carbs,
-                                  fat: entry.fat,
-                                  servings: [
-                                    {
-                                      description: entry.servingType,
-                                      calories: entry.baseCalories || entry.calories,
-                                      protein: entry.baseProtein || entry.protein,
-                                      carbs: entry.baseCarbs || entry.carbs,
-                                      fat: entry.baseFat || entry.fat,
-                                    },
-                                  ],
-                                });
-                                setIsNutritionLabelOpen(true);
-                              }
-                            }}
+                      <TableCell className="text-center p-2 text-xl">
+                            
+                        <div className="flex justify-center items-center h-full ">
+                          <LuInfo
+                            className="h-4 w-4 sm:h-5 sm:w-5 dark:text-gray-300 md:h-6 md:w-6 cursor-pointer hover:text-gray-500 transition-colors"
+                             onClick={() => handleInfoClick(entry)}
                           />
                         </div>
                       </TableCell>
@@ -226,7 +229,7 @@ export function FoodDiary({
                 className="mb-4 mr-2 h-5 w-5 dark:text-white hover:text-red-500"
               />
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-2 ">
               {searchResults.map((food) => {
                 const defaultServing =
                   food.servings.find((s) => s.default) || food.servings[0];
@@ -299,16 +302,18 @@ export function FoodDiary({
           onDelete={handleDeleteFood}
         />
       </CardContent>
-      <CardFooter>
-        <form onSubmit={handleAddFood} className="flex gap-2 w-full">
+      <CardFooter >
+        <form onSubmit={handleAddFood} className="relative flex-grow flex gap-2 w-full">
+          <LuSearch className="absolute left-2 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+          
           <Input
             placeholder="Search food item to add..."
             value={newFood}
             onChange={(e) => setNewFood(e.target.value)}
-            className="flex-1 dark:border-zinc-600 md:text-lg"
+            className="pl-8 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-300 dark:placeholder-gray-400"
             disabled={isSearching}
           />
-          <Button type="submit" className="md:text-lg hover:bg-zinc-700" disabled={isSearching}>
+          <Button type="submit" className="w-full sm:w-auto dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white md:text-lg" disabled={isSearching}>
             {isSearching ? "Searching..." : "Search"}
           </Button>
         </form>
