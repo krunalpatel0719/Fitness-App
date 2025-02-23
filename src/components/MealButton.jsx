@@ -8,14 +8,32 @@ export function MealButton({ meal, selected, onClick }) {
   
   return (
     <Button
-      variant={selected === meal ? "default" : "outline"}
+      
       size="sm"
       onClick={onClick}
-      className={
-        selected === meal 
-          ? 'h-8 w-14 text-xs sm:h-8 sm:w-auto sm:text-lg bg-blue-600  hover:bg-blue-700 text-white md:text-lg' 
-          : 'h-8 w-14 text-xs sm:h-8 sm:w-auto sm:text-lg dark:hover:bg-zinc-400 dark:hover:text-gray-100 dark:hover:border-zinc-400  md:text-lg'
-      }
+      className={`
+        h-8 w-14 
+        px-9
+        text-sm 
+        rounded-lg
+        font-medium
+        
+       
+        
+        
+        sm:text-md 
+        md:px-10
+        md:py-2
+        md:text-md
+        lg:px-12
+        lg:py-4
+        lg:text-lg
+        transition-colors
+        ${selected === meal 
+          ? 'hover:bg-blue-500 hover:text-white bg-blue-500  text-white' 
+          : 'bg-transparent border-0 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700'
+        }`}
+      
     > 
                        
       {formattedMeal}

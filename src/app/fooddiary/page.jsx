@@ -1,4 +1,4 @@
-// src/app/dashboard/page.jsx
+// src/app/fooddiary/page.jsx
 
 
 
@@ -15,7 +15,7 @@ import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, 
 import { format } from "date-fns";
 import { LuDumbbell } from "react-icons/lu";
 import { MetricsSection } from "@/components/MetricsSection";
-import { FoodDiary } from "@/components/FoodDiary";
+import { FoodDiarySection } from "@/components/FoodDiarySection";
 
 async function searchFood(query) {
   try {
@@ -35,7 +35,7 @@ async function searchFood(query) {
   }
 }
 
-export default function Dashboard() {
+export default function FoodDiary() {
   const router = useRouter();
   const { userLoggedIn, currentUser } = useAuth();
 
@@ -627,7 +627,7 @@ export default function Dashboard() {
                 foodEntries={foodEntries}
                 onInfoClick={handleDailyTotalInfo}
               />
-              <FoodDiary
+              <FoodDiarySection
                 selectedMeal={selectedMeal}
                 setSelectedMeal={setSelectedMeal}
                 foodEntries={foodEntries}

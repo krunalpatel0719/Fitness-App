@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { FiX, FiEdit2, FiTrash2 } from "react-icons/fi";
 
-export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
+export function NutritionLabel({ isOpen, onClose, food, formatServingDisplay, onEdit, onDelete }) {
   const [servingAmount, setServingAmount] = useState("1");
   const [selectedServing, setSelectedServing] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(
@@ -212,31 +212,50 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}  >
-      <DialogContent hideClose={true} className="w-10/12 max-w-sm sm:w-full sm:max-w-md dark:bg-zinc-800 max-h-[90vh] overflow-y-auto">
+      <DialogContent hideClose={true} className="w-10/12 max-w-sm sm:w-full sm:max-w-md dark:bg-zinc-800 max-h-[90vh] overflow-y-auto border-0">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="dark:text-white text-xl md:text-2xl border-b-2 border-gray-700 w-full pb-1">
+          <div className="flex items-center justify-between pb-4">
+            <DialogTitle className="text-left dark:text-white text-xl md:text-2xl w-full ">
               {isDailyTotal ? "Daily Total" : "Nutrition Facts"}
             </DialogTitle>
             <DialogClose className = "ml-6 sm:ml-0" asChild>
-              <FiX className="h-7 w-7 sm:h-5 w-5 dark:text-white hover:text-red-500" />
+              <FiX className="h-7 w-7 sm:h-5 sm:w-5 dark:text-white hover:text-red-500" />
             </DialogClose>
           </div>
-          <DialogDescription className="mr-12 sm:mr-0 text-black dark:text-gray-300 text-lg font-bold">
-            {food?.food_name}
+          <div>
+          <DialogDescription className=" text-left  mr-12 sm:mr-0 text-black dark:text-white text-lg font-bold">
+           {food?.food_name} 
+            
           </DialogDescription>
+          <DialogDescription className=" text-left  capitalize mr-12 sm:mr-0   text-gray-500 dark:text-gray-400 ">
+            
+            {formatServingDisplay(
+                        food?.servingAmount,
+                        food?.servingType
+                      )}
+          </DialogDescription>
+          </div>
+          
+        
         </DialogHeader>
 
-        <div className="space-y-4 ">
+        <div className={`
+        space-y-4
+        border-t
+       
+        ${isEditing && !isDailyTotal || !isExistingEntry && !isDailyTotal  
+          ? 'border-t-0' 
+          : ''
+        }`}>
           {isEditing && !isDailyTotal || !isExistingEntry && !isDailyTotal  ? (
             <>
             
-              <div className="flex gap-4">
+              <div className="flex gap-4 ">
                 <Input
                   type="number"
                   value={servingAmount}
                   onChange={(e) => setServingAmount(e.target.value)}
-                  className="w-24"
+                  className="w-24 "
                   min="0.1"
                   step="0.1"
                 />
@@ -284,34 +303,35 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
           ) : (
             !isDailyTotal ? (
             // View mode content
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="dark:text-gray-300">Serving Size:</span>
-                <span className="dark:text-white">
-                  {food.servingAmount} x {food.servingType}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="dark:text-gray-300">Meal Type:</span>
-                <span className="dark:text-white capitalize">
-                  {food.mealType}
-                </span>
-              </div>
-            </div>
+            // <div className="space-y-2">
+            //   <div className="flex justify-between">
+            //     <span className="dark:text-gray-300">Serving Size:</span>
+            //     <span className="dark:text-white">
+            //       {food.servingAmount} x {food.servingType}
+            //     </span>
+            //   </div>
+            //   <div className="flex justify-between">
+            //     <span className="dark:text-gray-300">Meal Type:</span>
+            //     <span className="dark:text-white capitalize">
+            //       {food.mealType}
+            //     </span>
+            //   </div>
+            // </div>
+            <> </>
             ) : ( <></>)
           )}
         </div>
 
-        <div className="border-b-2 border-gray-700 py-2">
-          <div className="text-xl font-bold dark:text-white">
-            Calories{" "}
-            {calculateNutrition(
+        <div className="">
+          <div className="flex justify-between text-xl font-bold dark:text-white">
+          <span className = "font-bold dark:text-white"> Calories</span> {" "}
+          <span className = "font-bold dark:text-white"> {calculateNutrition(
               selectedServing?.calories || food.calories || 0
-            )}
+            )} </span>
           </div>
         </div>
 
-        <div className="space-y-1 text-sm border-b border-gray-700 py-2">
+        <div className="space-y-1 text-sm border-b  border-white py-2">
           <div className="flex justify-between font-bold dark:text-white">
             <span>Total Fat</span>
             <span>{calculateNutrition(selectedServing?.fat || 0)}g</span>
@@ -370,7 +390,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
           </div>
 
           <div className="flex justify-between font-bold dark:text-white pt-1">
-            <span>Protein</span>
+            <span className = "font-medium">Protein</span>
             <span>{calculateNutrition(selectedServing?.protein || 0)}g</span>
           </div>
         </div>
@@ -414,13 +434,13 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
                   <div className="flex gap-2 w-full">
                     <Button
                       onClick={() => setIsEditing(false)}
-                      className="bg-red-500 hover:bg-red-600 flex-1"
+                      className="bg-red-600 hover:bg-red-500 flex-1 rounded-lg dark:text-gray-300"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleSaveEntry}
-                      className="bg-emerald-600 hover:bg-emerald-700 flex-1"
+                      className="bg-emerald-700 hover:bg-emerald-600 flex-1 rounded-lg dark:text-gray-300"
                     >
                       Save Changes
                     </Button>
@@ -428,7 +448,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
                 ) : (
                   <div className="flex gap-2 w-full">
                     <Button
-                      className="bg-gray-500 hover:bg-gray-600 flex-1"
+                      className="flex-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-600"
                       variant=""
                       onClick={() => setIsEditing(true)}
                     >
@@ -436,7 +456,7 @@ export function NutritionLabel({ isOpen, onClose, food, onEdit, onDelete }) {
                       Edit Entry
                     </Button>
                     <Button
-                      className="bg-red-500 hover:bg-red-600 flex-1"
+                      className="bg-red-600 hover:bg-red-500 flex-1 rounded-lg dark:text-gray-300"
                       onClick={onDelete}
                     >
                       <FiTrash2 className="mr-2"/>

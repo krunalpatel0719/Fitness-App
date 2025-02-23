@@ -31,7 +31,7 @@ export function SignInForm() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      router.push("/fooddiary");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,7 +45,7 @@ export function SignInForm() {
 
     try {
       await signInWithPopup(auth, googleProvider);
-      router.push("/dashboard");
+      router.push("/fooddiary");
     } catch (err) {
       setError(err.message);
     } finally {

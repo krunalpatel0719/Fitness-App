@@ -85,7 +85,7 @@ export function MetricsSection({ selectedDate, setSelectedDate, userMetrics, cal
       const dailyTotal = {
         food_name: `${foodEntries.length} ${foodEntries.length === 1 ? 'Item' : 'Items'}`,
         servingAmount: "1",
-        servingType: "day",
+        servingType: "",
         mealType: "daily total",
         // Pass the calculated totals directly
         calories: totalNutrition.calories || 0,
@@ -137,88 +137,58 @@ export function MetricsSection({ selectedDate, setSelectedDate, userMetrics, cal
     return (
       <>
         {/* Date Navigation Header */}
-        <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold tracking-tight  dark:text-white">Dashboard</h1>
-              <div className="flex items-center space-x-2 bg-white dark:bg-zinc-800 rounded-lg shadow p-2 dark:shadow-none">
-                <Button className = " dark:bg-white dark:text-black dark:hover:bg-zinc-400 dark:hover:text-gray-100" variant="" size="icon" onClick={() => setSelectedDate(subDays(selectedDate, 1))}>
-                  <LuChevronLeft className="h-4 w-4" />
+        <div className="flex items-center justify-between gap-4">
+              <h1 className="text-3xl font-bold tracking-tight  dark:text-white">Food Diary</h1>
+              <div className="flex items-center sm:space-x-2 bg-white dark:bg-zinc-800 rounded-lg shadow sm:p-2 dark:shadow-none">
+                <Button className = " bg-transparent sm:p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700" variant="" size="icon" onClick={() => setSelectedDate(subDays(selectedDate, 1))}>
+                  <LuChevronLeft className="h-4 w-4 sm:min-h-6 sm:min-w-6 " />
                 </Button>
-                <div className="flex flex-col items-center px-4">
-                  <span className="text-lg font-semibold dark:text-white">{format(selectedDate, "EEEE")}</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400"> {format(selectedDate, "MMMM d, yyyy")}</span>
+                <div className="flex flex-col items-center px-2 sm:px-6">
+                  <span className="text-nowrap text-xs sm:text-lg font-semibold dark:text-white">{format(selectedDate, "EEEE, MMMM d, yyyy")}</span>
+                  
                 </div>
-                <Button className = " dark:bg-white dark:text-black dark:hover:bg-zinc-400 dark:hover:text-gray-100" variant="" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, 1))}>
-                  <LuChevronRight className="h-4 w-4" />
+                {/* dark:bg-white dark:text-black dark:hover:bg-zinc-400 dark:hover:text-gray-100 */}
+                <Button className = " bg-transparent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700" variant="" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, 1))}>
+                  <LuChevronRight className="h-4 w-4 sm:min-h-6 sm:min-w-6" />
                 </Button>
               </div>
             </div>
 
-        {/* <Card className="dark:bg-zinc-800">
-          <CardContent className="py-4">
-            <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                onClick={() => setSelectedDate(subDays(selectedDate, 1))}
-                className="h-8 w-20 text-xs sm:text-sm sm:h-auto sm:w-auto dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
-              >
-                Previous Day
-              </Button>
-              <div className="flex flex-col items-center">
-                <span className="text-lg md:text-2xl font-semibold dark:text-white">
-                  {format(selectedDate, "EEEE")}
-                </span>
-                <span className="text-sm md:text-md dark:text-gray-300">
-                  {format(selectedDate, "MMMM d, yyyy")}
-                </span>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedDate(addDays(selectedDate, 1))}
-                className="h-8 w-20 text-xs sm:text-sm sm:h-auto sm:w-auto dark:hover:bg-zinc-400 dark:hover:border-zinc-400 dark:text-gray-800 hover:text-white"
-              >
-                Next Day
-              </Button>
-            </div>
-          </CardContent>
-        </Card> */}
   
         {/* Cards: Daily Goal and Daily Progress */}
         <div className="grid gap-4 md:grid-cols-2">
           {/* Daily Goal Card */}
-          <Card className="border-0 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white">
+          <Card className="border-0 bg-gradient-to-br from-blue-500 to-blue-600  text-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg font-medium ">Daily Goal</CardTitle>
               <LuUtensils className="h-5 w-5 opacity-70" />
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold">
+              <div className="text-3xl font-bold">
                 {userMetrics.dailyCalories}
                 <span className="text-lg ml-1 opacity-70">kcal</span>
               </div>
-              <p className="text-sm mt-1 opacity-70">Target for {format(selectedDate, "MMM d, yyyy")}</p>
+             
             </CardContent>
           </Card>
   
           {/* Daily Progress Card */}
           <Card className="border-0 bg-white dark:bg-zinc-800 shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-medium dark:text-white">Daily Progress</CardTitle>
-              <LuActivity className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              <CardTitle className="text-lg font-medium dark:text-white">Calories Consumed</CardTitle>
+              <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-blue-600 dark:text-blue-400 flex items-center gap-2 " // Added flex, items-center, and gap-2
+                    onClick={handleInfoClick}
+                  >
+                    <LuInfo className="min-h-5 min-w-5" /> {/* Removed mr-1 since we're using gap-2 */}
+                   
+                  </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                
                 <ProgressBar current={caloriesConsumed} goal={userMetrics.dailyCalories} />
-                <div className="flex justify-end items-center "> {/* Added items-center and removed text-sm */}
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto text-blue-600 dark:text-blue-400 flex items-center gap-2 " // Added flex, items-center, and gap-2
-                    onClick={handleInfoClick}
-                  >
-                    <LuInfo className="h-12 w-12" /> {/* Removed mr-1 since we're using gap-2 */}
-                    <span className="text-md">Details</span> {/* Moved text-sm to the text only */}
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>

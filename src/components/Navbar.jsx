@@ -16,7 +16,7 @@ export function Navbar() {
   const router = useRouter();
 
   const navItems = [
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "Food Diary", href: "/fooddiary" },
     { name: "Videos", href: "/videos" },
     { name: "Progress", href: "/progress" },
   ];
@@ -43,8 +43,8 @@ export function Navbar() {
                 href={item.href}
                 className={`text-md font-medium transition-colors ${
                   pathname === item.href
-                    ? "text-blue-600 dark:text-blue-500"
-                    : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-500"
+                    ? "text-blue-500"
+                    : "text-gray-600 hover:text-blue-500 dark:text-gray-300 "
                 }`}
               >
                 {item.name}

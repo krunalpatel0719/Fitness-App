@@ -33,7 +33,7 @@ export function SignUpForm({ className, ...props }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName });
-      router.push("/dashboard");
+      router.push("/fooddiary");
     } catch (err) {
       setError(err.message);
     } finally {
