@@ -138,7 +138,9 @@ export function NutritionLabel({ isOpen, onClose, food, formatServingDisplay, on
 
   const handleSaveEntry = useCallback(() => {
     if (!selectedServing) return;
-  
+    if (servingAmount == "" || parseFloat(servingAmount) <= 0) {
+      setServingAmount("1");
+    }
     const entryData = {
       ...food,
       servingAmount,
@@ -230,7 +232,7 @@ export function NutritionLabel({ isOpen, onClose, food, formatServingDisplay, on
           <DialogDescription className=" text-left  capitalize mr-12 sm:mr-0   text-gray-500 dark:text-gray-400 ">
             
             {formatServingDisplay(
-                        food?.servingAmount,
+                        food?.servingAmount || 1,
                         food?.servingType
                       )}
           </DialogDescription>
@@ -254,7 +256,11 @@ export function NutritionLabel({ isOpen, onClose, food, formatServingDisplay, on
                 <Input
                   type="number"
                   value={servingAmount}
-                  onChange={(e) => setServingAmount(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setServingAmount(value);
+                    
+                  }}
                   className="w-24 "
                   min="0.1"
                   step="0.1"

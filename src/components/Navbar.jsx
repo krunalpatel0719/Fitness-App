@@ -17,6 +17,7 @@ export function Navbar() {
 
   const navItems = [
     { name: "Food Diary", href: "/fooddiary" },
+    { name: "Workouts", href: "/workouts" },
     { name: "Videos", href: "/videos" },
     { name: "Progress", href: "/progress" },
   ];

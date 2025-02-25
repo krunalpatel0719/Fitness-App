@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 
-export function MealButton({ meal, selected, onClick }) {
+export function MealButton({ meal, selected, onClick,disabled }) {
   const formattedMeal = meal.charAt(0).toUpperCase() + meal.slice(1);
   
   return (
@@ -11,6 +11,7 @@ export function MealButton({ meal, selected, onClick }) {
       
       size="sm"
       onClick={onClick}
+    
       className={`
         h-8 w-14 
         px-9
@@ -29,9 +30,11 @@ export function MealButton({ meal, selected, onClick }) {
         lg:py-4
         lg:text-lg
         transition-colors
-        ${selected === meal 
-          ? 'hover:bg-blue-500 hover:text-white bg-blue-500  text-white' 
-          : 'bg-transparent border-0 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700'
+        ${disabled 
+          ? 'opacity-50 cursor-not-allowed bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-400' 
+          : selected === meal 
+            ? 'hover:bg-blue-500 hover:text-white bg-blue-500 text-white' 
+            : 'bg-transparent border-0 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700'
         }`}
       
     > 

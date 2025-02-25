@@ -8,7 +8,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
       <nav className="bg-white dark:bg-zinc-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <LuDumbbell className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500" />
@@ -28,7 +28,7 @@ export function LandingPage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             Track Your Nutrition
@@ -48,8 +48,8 @@ export function LandingPage() {
           </a>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="grid gap-6 md:gap-12 md:grid-cols-3">
+          <div className=" bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
             <div className="p-8">
               <div className="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
                 <LuNotebookPen  className="h-6 w-6 text-blue-600 dark:text-blue-400" />

@@ -14,7 +14,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import { format } from "date-fns";
 import { LuDumbbell } from "react-icons/lu";
-import { MetricsSection } from "@/components/MetricsSection";
+import { FoodMetricsSection } from "@/components/FoodMetricsSection";
 import { FoodDiarySection } from "@/components/FoodDiarySection";
 
 async function searchFood(query) {
@@ -108,66 +108,7 @@ export default function FoodDiary() {
     return () => unsubscribe();
   }, [currentUser, userLoggedIn, selectedDate]);
 
-  // (Helper functions and handlers such as calculateCalories, formatServingDisplay,
-  // handleFoodSelection, handleAddFood, handleQuickAdd, handleEditFood,
-  // handleAddFoodWithServing, handleDeleteFood, handleNutritionLabelClose, and handleSearch
-  // remain unchanged; include them here as in your existing code.)
 
-
-  useEffect(() => {
-    if (!userLoggedIn || !currentUser?.uid) {
-      router.push("/signin");
-      return;
-    }
-
-    // Load user metrics once on page load
-    const loadMetrics = async () => {
-      try {
-        const docRef = doc(db, "user_metrics", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) setUserMetrics(docSnap.data());
-      } catch (error) {
-        console.error("Error loading metrics:", error);
-      } finally {
-        setLoadingMetrics(false);
-      }
-    };
-
-    // Realtime listener for today's food log
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
-    const q = query(
-      collection(db, "food_logs"),
-      where("userId", "==", currentUser.uid),
-      where("date", "==", dateStr),
-      orderBy("createdAt", "desc")
-    );
-  
-
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const entries = [];
-        let total = 0;
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          entries.push({ id: doc.id, ...data });
-          total += Number(data.calories) || 0;
-        });
-        setFoodEntries(entries);
-        setCaloriesConsumed(Math.round(total)); 
-        setLoadingFoodLog(false);
-      },
-      (error) => {
-        console.error("Food log error:", error);
-        setLoadingFoodLog(false);
-      }
-    );
-
-    if (currentUser?.uid) {
-      loadMetrics();
-    }
-    return () => unsubscribe();
-  }, [currentUser, userLoggedIn, selectedDate]);
 
   const calculateCalories = (metrics) => {
 
@@ -607,7 +548,7 @@ export default function FoodDiary() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
       <Navbar />
       <main className="border-0 flex-1 p-6 lg:p-8">
-        <div className="container max-w-6xl space-y-8 mx-auto">
+        <div className="container max-w-7xl space-y-8 mx-auto">
           {loadingMetrics ? (
             <div className="max-w-md mx-auto">
               <Skeleton className="h-8 w-full" />
@@ -619,7 +560,7 @@ export default function FoodDiary() {
             </div>
           ) : (
             <>
-              <MetricsSection
+              <FoodMetricsSection
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
                 userMetrics={userMetrics}
