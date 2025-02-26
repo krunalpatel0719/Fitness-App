@@ -153,7 +153,7 @@ import { getAllExercises, searchExercises } from "@/lib/exercises";
 //   }
 // ]; 
 
-const EXERCISE_LIBRARY = getAllExercises();
+// const EXERCISE_LIBRARY = getAllExercises();
 
 export function WorkoutLog({selectedDate}) {
   const { userLoggedIn, currentUser } = useAuth();
@@ -161,7 +161,17 @@ export function WorkoutLog({selectedDate}) {
   const [exercises, setExercises] = useState([]);
   const [expandedExercises, setExpandedExercises] = useState([]);
   const [expandedLibraryItem, setExpandedLibraryItem] = useState(null);
+  const [exerciseLibrary, setExerciseLibrary] = useState([]);
+  const [quickAddForm, setQuickAddForm] = useState({
+    exerciseId: null,
+    name: '',
+    sets: '',
+    reps: '',
+    weight: ''
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
+
   const [newExercise, setNewExercise] = useState({
     name: "",
     sets: "",
@@ -173,17 +183,12 @@ export function WorkoutLog({selectedDate}) {
   const [isLoading, setIsLoading] = useState(false);
   const exercisesPerPage = 20;
 
+   useEffect(() => {
+    const allExercises = getAllExercises();
+    setExerciseLibrary(allExercises);
+  }, []);
 
-  const handleLoadMore = () => {
-    if (isLoading) return;
-    
-    setIsLoading(true);
-    setTimeout(() => {
-      setCurrentPage(prev => prev + 1);
-      setIsLoading(false);
-    }, 300); // Small delay to prevent rapid loading
-  };
-
+ 
   
   useEffect(() => {
     if (!currentUser?.uid) return;
@@ -196,6 +201,17 @@ export function WorkoutLog({selectedDate}) {
     
     return () => unsubscribe();
   }, [currentUser, selectedDate]);
+
+  const handleLoadMore = () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    setTimeout(() => {
+      setCurrentPage(prev => prev + 1);
+      setIsLoading(false);
+    }, 300); 
+  };
+
 
   const toggleExercise = (exerciseId) => {
     setExpandedExercises((prev) =>
@@ -227,14 +243,40 @@ export function WorkoutLog({selectedDate}) {
   }, [isLoading]);
   
 
-   const handleAddExercise = async (e) => {
+
+  // const filteredExercises = EXERCISE_LIBRARY.filter(exercise => {
+  //   const query = searchQuery.toLowerCase();
+  //   const filtered = EXERCISE_LIBRARY.filter(exercise => 
+  //     exercise.name.toLowerCase().includes(query) || 
+  //     (exercise.muscleGroups && exercise.muscleGroups.some(group => group?.toLowerCase?.().includes(query))) ||
+  //     (exercise.difficulty && exercise.difficulty.toLowerCase().includes(query))
+  //   );
+    
+  //   // Only return exercises for the current page
+  //   return filtered.slice(0, currentPage * exercisesPerPage);
+  // });
+
+  
+  const filteredExercises = exerciseLibrary.filter((exercise) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      exercise.name.toLowerCase().includes(query) ||
+      (exercise.muscleGroups && exercise.muscleGroups.some((group) => group.toLowerCase().includes(query))) ||
+      (exercise.difficulty && exercise.difficulty.toLowerCase().includes(query))
+    );
+  });
+
+  const pagedExercises = filteredExercises.slice(0, currentPage * exercisesPerPage);
+
+  
+  const handleAddExercise = async (e) => {
     e.preventDefault();
     const { name, sets, reps, weight } = newExercise;
     const parsedSets = Math.max(1, parseInt(sets) || 0);
     const parsedReps = Math.max(1, parseInt(reps) || 0);
     const parsedWeight = Math.max(0, parseInt(weight) || 0);
 
-    if (!name || !parsedSets || !parsedReps || !parsedWeight) return;
+    if (!name || !parsedSets || !parsedReps ) return;
     if (!name || parsedSets === 0 || parsedReps === 0) return;
 
     const newSets = Array.from({ length: parsedSets }, (_, i) => ({
@@ -254,20 +296,85 @@ export function WorkoutLog({selectedDate}) {
     }
   };
 
-  const filteredExercises = EXERCISE_LIBRARY.filter(exercise => {
-    const query = searchQuery.toLowerCase();
-    const filtered = EXERCISE_LIBRARY.filter(exercise => 
-      exercise.name.toLowerCase().includes(query) || 
-      (exercise.muscleGroups && exercise.muscleGroups.some(group => group?.toLowerCase?.().includes(query))) ||
-      (exercise.difficulty && exercise.difficulty.toLowerCase().includes(query))
-    );
+  const handleQuickAdd = (exerciseId, e) => {
+    e?.stopPropagation(); // Optional chaining in case called without event
+  
+    // Toggle the form - close if already open for this exercise, open if not
+    if (quickAddForm.exerciseId === exerciseId) {
+      setQuickAddForm({
+        exerciseId: null,
+        name: '',
+        sets: '',
+        reps: '',
+        weight: ''
+      });
+    } else {
+      // Find the exercise by ID from the exerciseLibrary
+      const selectedExercise = exerciseLibrary.find(ex => ex.id === exerciseId);
+      
+      if (selectedExercise) {
+        setQuickAddForm({
+          exerciseId,
+          name: selectedExercise.name || "Exercise",
+          sets: '3',
+          reps: '8',
+          weight: '0'
+        });
+      } else {
+        console.error(`Exercise with id ${exerciseId} not found`);
+        // Set default values if exercise not found
+        setQuickAddForm({
+          exerciseId,
+          name: "Unknown exercise",
+          sets: '3',
+          reps: '8',
+          weight: '0'
+        });
+      }
+    }
+  };
+  
+  const handleQuickAddSubmit = async (e, exercise) => {
+    e.preventDefault();
     
-    // Only return exercises for the current page
-    return filtered.slice(0, currentPage * exercisesPerPage);
-  });
+    const { sets, reps, weight } = quickAddForm;
+    const parsedSets = Math.max(1, parseInt(sets) || 0);
+    const parsedReps = Math.max(1, parseInt(reps) || 0);
+    const parsedWeight = Math.max(0, parseInt(weight) || 0);
+    
+    // Validation
+    if (parsedSets === 0 || parsedReps === 0) {
+      alert("Sets and reps must be at least 1");
+      return;
+    }
+    
+    // Create sets array
+    const newSets = Array.from({ length: parsedSets }, (_, i) => ({
+      weight: parsedWeight,
+      reps: parsedReps,
+      setNumber: i + 1
+    }));
+    
+    try {
+      await addOrUpdateExerciseLog(currentUser.uid, {
+        name: exercise.name,
+        sets: newSets
+      }, selectedDate);
+      
+      // Reset form after successful submission
+      setQuickAddForm({
+        exerciseId: null,
+        name: '',
+        sets: '',
+        reps: '',
+        weight: ''
+      });
+    } catch (error) {
+      console.error("Error adding exercise:", error);
+    }
+  };
 
-  
-  
+
   const handleDeleteSet = async (exerciseId, setNumber) => {
     try {
       const exercise = exercises.find(ex => ex.id === exerciseId);
@@ -336,7 +443,7 @@ export function WorkoutLog({selectedDate}) {
             <div className="flex gap-2">
               <Input
                 type="number"
-                min="1"
+                min="0"
                 placeholder="Weight (lbs)"
                 value={newExercise.weight}
                 onChange={(e) =>
@@ -460,19 +567,30 @@ export function WorkoutLog({selectedDate}) {
                 type="text"
                 placeholder="Search exercises..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setSearchQuery(value);
+                  if (value.trim() === "") {
+                    setCurrentPage(1); 
+                  }
+                }}
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
             <div className="exercise-library-container max-h-[485px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-600 scrollbar-track-transparent">
-              {filteredExercises.map((item) => (
+              {pagedExercises.map((item) => (
                 <ExerciseLibraryLog 
                   key={item.id} 
                   item={item} 
                   expandedLibraryItem={expandedLibraryItem} 
                   setExpandedLibraryItem={setExpandedLibraryItem} 
+                  quickAddForm={quickAddForm}
+                  setQuickAddForm={setQuickAddForm}
+                  handleQuickAdd={handleQuickAdd}
+                  handleQuickAddSubmit={handleQuickAddSubmit}
+
                 />
               ))}
               {isLoading && (

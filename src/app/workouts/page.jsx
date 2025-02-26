@@ -18,23 +18,7 @@ import { LuDumbbell } from "react-icons/lu";
 import { WorkoutMetricsSection } from "@/components/WorkoutMetricsSection";
 import { WorkoutLog } from "@/components/WorkoutLog";
 
-async function searchFood(query) {
-  try {
-    const response = await fetch(
-      `/api/foods?query=${encodeURIComponent(query)}`
-    );
-    const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "Unknown API error");
-    }
-
-    return data.foods;
-  } catch (error) {
-    console.error("Search failed:", error);
-    throw error;
-  }
-}
 
 export default function Workouts() {
   const router = useRouter();
@@ -42,16 +26,11 @@ export default function Workouts() {
 
   const [userMetrics, setUserMetrics] = useState(null);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
-  const [foodEntries, setFoodEntries] = useState([]);
-  const [newFood, setNewFood] = useState("");
 
-  const [loadingFoodLog, setLoadingFoodLog] = useState(true);
   const [selectedMeal, setSelectedMeal] = useState("breakfast");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedFood, setSelectedFood] = useState(null);
-  const [isNutritionLabelOpen, setIsNutritionLabelOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -82,7 +61,6 @@ export default function Workouts() {
       }
     };
 
-    // Realtime listener for today's food log based on selectedDate
    
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     const q = query(
@@ -149,7 +127,6 @@ export default function Workouts() {
                 totalVolume={totalVolume}
                 totalExercise={totalExercise}
                 totalSets={totalSets}
-                foodEntries={foodEntries}
                 onInfoClick={handleDailyTotalInfo}
               />
               <WorkoutLog
