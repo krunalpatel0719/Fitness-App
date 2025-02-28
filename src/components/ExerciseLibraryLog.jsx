@@ -1,17 +1,8 @@
 //src/components/ExerciseLibraryLog.jsx
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import Image from "next/image";
 
 import {
-  LuInfo,
   LuPlus,
   LuSearch,
   LuDumbbell,
@@ -19,9 +10,7 @@ import {
   LuChevronDown,
   LuChevronLeft,
   LuChevronRight,
-  LuTrash,
   LuBook,
-  LuBookmark,
 } from "react-icons/lu";
 
 import { useState, useEffect, useRef } from "react";
@@ -36,12 +25,10 @@ export function ExerciseLibraryLog({
   handleQuickAddSubmit,
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [shouldLoadImage, setShouldLoadImage] = useState(false);
   const itemRef = useRef(null);
 
   useEffect(() => {
-    // Use IntersectionObserver to detect when element is visible
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -74,23 +61,21 @@ export function ExerciseLibraryLog({
     );
   };
   const toggleExpand = (e) => {
-    setExpandedLibraryItem(
-      expandedLibraryItem === item.id ? null : item.id
-    );
+    setExpandedLibraryItem(expandedLibraryItem === item.id ? null : item.id);
   };
-  
+
   const cycleImage = (e) => {
     e.stopPropagation();
     handleNextImage(e);
   };
-  
+
   return (
     <div
       key={item.id}
       className="border-b  border-gray-200 dark:border-zinc-700 last:border-0"
-      ref = {itemRef}
+      ref={itemRef}
     >
-     <div 
+      <div
         className="p-4 hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition-colors cursor-pointer"
         onClick={toggleExpand}
       >
@@ -110,27 +95,37 @@ export function ExerciseLibraryLog({
               </div>
             )}
 
-            <div>
-              <h3 className="font-medium text-gray-900 dark:text-white">
+            <div className="min-w-0 flex-1">
+              {" "}
+              {/* Added min-w-0 and flex-1 */}
+              <h3 className="font-medium text-gray-900 dark:text-white truncate text-wrap text-sm sm:text-base">
+                {" "}
+                {/* Added truncate */}
                 {item.name}
               </h3>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="ml-2 flex items-center gap-2 flex-shrink-0">
+            {" "}
+            {/* Added flex-shrink-0 */}
             <button
-              onClick={(e) => handleQuickAdd(item.id, e)}
-              className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleQuickAdd(item.id, e);
+              }}
+              className="flex-shrink-0 w-22 h-7 px-2 py-1 text-xs sm:h-auto sm:w-auto sm:text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-1"
             >
               <LuPlus className="h-4 w-4" />
               Quick Add
             </button>
             <button
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 setExpandedLibraryItem(
                   expandedLibraryItem === item.id ? null : item.id
-                )
-              }
-              className="p-1.5 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-600 transition-colors"
+                );
+              }}
+              className="flex-shrink-0 p-1.5 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-600 transition-colors"
             >
               {expandedLibraryItem === item.id ? (
                 <LuChevronUp className="h-5 w-5 text-gray-400" />
@@ -142,10 +137,10 @@ export function ExerciseLibraryLog({
         </div>
         {quickAddForm.exerciseId === item.id && (
           <form
-           onClick={(e) => e.stopPropagation()} // Stop propagation at the form level
+            onClick={(e) => e.stopPropagation()}
             onSubmit={(e) => {
               e.preventDefault();
-              e.stopPropagation(); // Also stop propagation on submit
+              e.stopPropagation();
               handleQuickAddSubmit(e, item);
             }}
             className="mt-4 p-4 bg-gray-50 dark:bg-zinc-700/50 rounded-lg"
@@ -243,7 +238,7 @@ export function ExerciseLibraryLog({
                     index === currentImageIndex ? "block" : "hidden"
                   }`}
                 >
-                  <div 
+                  <div
                     className="absolute inset-0 z-10 cursor-pointer"
                     onClick={cycleImage}
                     title="Click to see next image"
@@ -260,7 +255,7 @@ export function ExerciseLibraryLog({
                 </div>
               ))
             ) : (
-              <div className="relative h-full w-full rounded-lg overflow-hidden "  >
+              <div className="relative h-full w-full rounded-lg overflow-hidden ">
                 <Image
                   src="/exercise-placeholder.jpg"
                   alt={item.name}
@@ -269,22 +264,6 @@ export function ExerciseLibraryLog({
                 />
               </div>
             )}
-            {/* {item.images && item.images.length > 1 && (
-              <>
-                <button
-                  onClick={handlePreviousImage}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-zinc-800/80 p-2 rounded-full shadow-sm"
-                >
-                  <LuChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={handleNextImage}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-zinc-800/80 p-2 rounded-full shadow-sm"
-                >
-                  <LuChevronRight className="h-5 w-5" />
-                </button>
-              </>
-            )} */}
           </div>
 
           <div className="space-y-4">

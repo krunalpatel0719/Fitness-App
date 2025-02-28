@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import { format } from "date-fns";
-import { LuDumbbell } from "react-icons/lu";
 import { FoodMetricsSection } from "@/components/FoodMetricsSection";
 import { FoodDiarySection } from "@/components/FoodDiarySection";
 
@@ -406,10 +405,7 @@ export default function FoodDiary() {
       const updatedData = {
         foodName: updatedFood.food_name,
         food_id: updatedFood.food_id,
-        // calories: Math.round(Number(selectedServing.calories) * parseFloat(updatedFood.servingAmount)),
-        // protein: Math.round(Number(selectedServing.protein) * parseFloat(updatedFood.servingAmount)),
-        // carbs: Math.round(Number(selectedServing.carbs) * parseFloat(updatedFood.servingAmount)),
-        // fat: Math.round(Number(selectedServing.fat) * parseFloat(updatedFood.servingAmount)),
+
 
         calories: calculateNutrition(selectedServing.calories),
         protein: calculateNutrition(selectedServing.protein),

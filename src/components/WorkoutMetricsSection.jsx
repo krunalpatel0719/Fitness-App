@@ -1,39 +1,22 @@
 // src/components/MetricSection.jsx
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ProgressBar } from "@/components/ProgressBar";
-import { format, subDays, addDays } from "date-fns";
-import { CiCircleInfo } from "react-icons/ci";
-import { useState, useEffect } from "react";
+
+
 import {
-  ChevronDown,
-  ChevronUp,
-  Dumbbell,
-  BarChart3,
-  Target,
-} from "lucide-react";
-import {
-  LuCircleInfo,
-  LuChevronLeft,
-  LuChevronRight,
+
   LuDumbbell,
   LuChartColumn,
   LuTarget,
-  LuUtensils,
-  LuActivity,
-  LuBook 
+ 
 } from "react-icons/lu";
-import { LuInfo } from "react-icons/lu";
 import { CalendarHeader } from "@/components/CalendarHeader";
 
 export function WorkoutMetricsSection({
   selectedDate,
   setSelectedDate,
-  userMetrics,
   totalVolume,
   totalExercise,
   totalSets,
-  onInfoClick,
 }) {
   
 

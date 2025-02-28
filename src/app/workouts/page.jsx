@@ -11,10 +11,9 @@ import { Navbar } from "@/components/Navbar";
 import { MetricsForm } from "@/components/MetricsForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 
 import { format } from "date-fns";
-import { LuDumbbell } from "react-icons/lu";
 import { WorkoutMetricsSection } from "@/components/WorkoutMetricsSection";
 import { WorkoutLog } from "@/components/WorkoutLog";
 
@@ -27,20 +26,14 @@ export default function Workouts() {
   const [userMetrics, setUserMetrics] = useState(null);
   const [loadingMetrics, setLoadingMetrics] = useState(true);
 
-  const [selectedMeal, setSelectedMeal] = useState("breakfast");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
 
   const [exercises, setExercises] = useState([]);
   const [totalExercise, setTotalExercise] = useState(0);
   const [totalVolume, setTotalVolume] = useState(0);
   const [totalSets, setTotalSets] = useState(0);
-  const handleDailyTotalInfo = () => {
-    alert("This is the total calories consumed for the day.");
-  }
+
 
   useEffect(() => {
     if (!userLoggedIn || !currentUser?.uid) {
@@ -123,11 +116,9 @@ export default function Workouts() {
               <WorkoutMetricsSection
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
-                userMetrics={userMetrics}
                 totalVolume={totalVolume}
                 totalExercise={totalExercise}
                 totalSets={totalSets}
-                onInfoClick={handleDailyTotalInfo}
               />
               <WorkoutLog
                 selectedDate= {selectedDate}

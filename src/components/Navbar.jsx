@@ -1,3 +1,4 @@
+'use client';
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import Link from "next/link";
 import { signOut } from "firebase/auth";
