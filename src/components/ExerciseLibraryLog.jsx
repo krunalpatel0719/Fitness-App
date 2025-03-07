@@ -71,6 +71,7 @@ export function ExerciseLibraryLog({
 
   return (
     <div
+      data-exercise-item
       key={item.id}
       className="border-b  border-gray-200 dark:border-zinc-700 last:border-0"
       ref={itemRef}

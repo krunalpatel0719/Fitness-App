@@ -27,9 +27,11 @@ export default function SettingsPage() {
   const handleMetricsSubmit = async (metrics) => {
     try {
       const bmr = calculateCalories(metrics);
+      const protein = calculateProtein(metrics);
       await setDoc(doc(db, "user_metrics", currentUser.uid), {
         ...metrics,
         dailyCalories: bmr,
+        dailyProtein: protein,
         userId: currentUser.uid,
         updatedAt: new Date()
       });
@@ -56,7 +58,7 @@ export default function SettingsPage() {
       active: 1.55,
       veryActive: 1.725
     };
-
+  
     const tdee = bmr * activityMultipliers[metrics.activityLevel];
 
     switch (metrics.goal) {
@@ -65,7 +67,15 @@ export default function SettingsPage() {
       default: return Math.round(tdee);
     }
   };
+  const calculateProtein = (metrics) => {
+   
 
+    switch (metrics.goal) {
+      case 'lose': return Math.round(parseFloat(metrics.weight));
+      case 'gain': return Math.round(parseFloat(metrics.weight) * .8);
+      default: return Math.round(parseFloat(metrics.weight));
+    }
+  };
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-zinc-900">
       <Navbar />

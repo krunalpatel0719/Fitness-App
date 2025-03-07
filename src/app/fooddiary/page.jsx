@@ -140,6 +140,16 @@ export default function FoodDiary() {
     }
   };
 
+  const calculateProtein = (metrics) => {
+   
+
+    switch (metrics.goal) {
+      case 'lose': return Math.round(parseFloat(metrics.weight));
+      case 'gain': return Math.round(parseFloat(metrics.weight) * .8);
+      default: return Math.round(parseFloat(metrics.weight));
+    }
+  };
+
 
   const formatServingDisplay = (amount, type) => {
     if (!amount || !type) return "";
@@ -470,13 +480,15 @@ export default function FoodDiary() {
   const handleSaveMetrics = async (metrics) => {
     try {
       const dailyCalories = calculateCalories(metrics);
+      const dailyProtein = calculateProtein(metrics);
       await setDoc(doc(db, "user_metrics", currentUser.uid), {
         ...metrics,
         dailyCalories,
+        dailyProtein,
         userId: currentUser.uid,
         createdAt: new Date(),
       });
-      setUserMetrics({ ...metrics, dailyCalories });
+      setUserMetrics({ ...metrics, dailyCalories, dailyProtein });
     } catch (error) {
       console.error("Error saving metrics:", error);
     }
