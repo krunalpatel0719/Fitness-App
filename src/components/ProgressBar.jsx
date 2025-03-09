@@ -11,8 +11,7 @@ export function ProgressBar({ current, goal }) {
         <span className={`font-bold text-3xl ${
             isOver ? 'text-red-600 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'
           }`} >{current} kcal</span>
-        {/* <span className='md:text-lg text-gray-500 dark:text-gray-400'
-          >{goal} kcal</span> */}
+
       </div>
       <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-zinc-600">
         <div

@@ -57,7 +57,7 @@ export function SignInForm() {
      
       
       <div className="w-full max-w-md">
-        <Card className="dark:bg-zinc-800">
+        <Card className="dark:bg-zinc-800 border dark:border-zinc-700">
           <CardHeader>
             <CardTitle className="text-2xl dark:text-white">Sign In</CardTitle>
             <CardDescription className="dark:text-gray-300">

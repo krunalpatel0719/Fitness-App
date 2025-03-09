@@ -43,7 +43,7 @@ export function SignUpForm({ className, ...props }) {
 
   return (
     <div className={cn("flex flex-col gap-6 w-full max-w-md", className)} {...props}>
-      <Card className="dark:bg-zinc-800">
+      <Card className="dark:bg-zinc-800 border dark:border-zinc-700">
         <CardHeader>
           <CardTitle className="text-2xl dark:text-white">Sign Up</CardTitle>
           <CardDescription className="dark:text-gray-300">

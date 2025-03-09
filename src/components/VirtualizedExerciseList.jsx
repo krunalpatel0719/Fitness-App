@@ -12,17 +12,16 @@ export function VirtualizedExerciseList({
 }) {
   const containerRef = useRef(null);
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 20 });
-  const [itemHeight, setItemHeight] = useState(80); // Default height estimation
+  const [itemHeight, setItemHeight] = useState(80); 
   const [containerHeight, setContainerHeight] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
 
-  // Enhanced calculation of visible range with better buffer
   const calculateVisibleRange = (scrollTop = containerRef.current?.scrollTop || 0) => {
     if (!containerRef.current) return;
     
     const viewportHeight = containerRef.current.clientHeight;
-    const bufferSize = Math.ceil(viewportHeight / itemHeight) * 2; // Dynamic buffer based on viewport
+    const bufferSize = Math.ceil(viewportHeight / itemHeight) * 2;
     
     const start = Math.max(0, Math.floor(scrollTop / itemHeight) - Math.floor(bufferSize / 2));
     const end = Math.min(
@@ -33,20 +32,16 @@ export function VirtualizedExerciseList({
     setVisibleRange({ start, end });
   };
 
-  // Initial setup and measurements
   useEffect(() => {
     if (!containerRef.current) return;
     
-    // Set initial container height
     setContainerHeight(containerRef.current.clientHeight);
     
-    // Initial calculation with a slight delay to ensure DOM has rendered
     const timer = setTimeout(() => {
       calculateVisibleRange();
       setIsInitialized(true);
     }, 50);
     
-    // Measure actual item height for better calculation
     if (containerRef.current.children.length > 1) {
       const firstItem = containerRef.current.querySelector('[data-exercise-item]');
       if (firstItem && firstItem.offsetHeight > 0) {
@@ -54,7 +49,6 @@ export function VirtualizedExerciseList({
       }
     }
     
-    // Window resize handler
     const handleResize = () => {
       setContainerHeight(containerRef.current?.clientHeight || 0);
       calculateVisibleRange();
@@ -68,18 +62,14 @@ export function VirtualizedExerciseList({
     };
   }, []);
 
-  // Handle search changes or other major list updates
   useEffect(() => {
     if (!containerRef.current) return;
     
-    // Save scroll position before updating
     const scrollPosition = containerRef.current.scrollTop;
     setLastScrollPosition(scrollPosition);
     
-    // Reset scroll if this is a new search
     if (containerRef.current && isInitialized) {
-      // Only scroll to top on new searches, not on initial load
-      // containerRef.current.scrollTop = 0;
+  
     }
     
     // Recalculate visible range
@@ -90,11 +80,9 @@ export function VirtualizedExerciseList({
     return () => clearTimeout(timer);
   }, [exercises]);
 
-  // Handle expanded item changes - preserve scroll position
   useEffect(() => {
     if (!containerRef.current) return;
     
-    // Small timeout to let the DOM update before restoring scroll
     const timer = setTimeout(() => {
       if (containerRef.current) {
         calculateVisibleRange();
@@ -104,7 +92,6 @@ export function VirtualizedExerciseList({
     return () => clearTimeout(timer);
   }, [expandedLibraryItem]);
 
-  // Set up scroll event listener
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -122,24 +109,17 @@ export function VirtualizedExerciseList({
     };
   }, [itemHeight, exercises.length]);
 
-  // Calculate total scroll height
   const totalHeight = exercises.length * itemHeight;
   
-  // Calculate the amount of space to pad before visible items
   const paddingTop = visibleRange.start * itemHeight;
   
-  // Get only the visible items
   const visibleItems = exercises.slice(visibleRange.start, visibleRange.end);
 
-  // Handle expanding items without scroll jump
   const handleExpand = (itemId) => {
-    // Store current scroll position
     const currentScroll = containerRef.current?.scrollTop || 0;
     
-    // Update expanded state
     setExpandedLibraryItem(expandedLibraryItem === itemId ? null : itemId);
     
-    // Restore scroll position after state update
     requestAnimationFrame(() => {
       if (containerRef.current) {
         containerRef.current.scrollTop = currentScroll;
@@ -158,16 +138,14 @@ export function VirtualizedExerciseList({
         </div>
       ) : (
         <>
-          {/* Spacer div to maintain scroll position */}
           <div style={{ height: paddingTop }} />
           
-          {/* Only render visible items */}
           {visibleItems.map((item) => (
             <div key={item.id} data-exercise-item>
               <ExerciseLibraryLog 
                 item={item} 
                 expandedLibraryItem={expandedLibraryItem} 
-                setExpandedLibraryItem={handleExpand} // Use our custom handler
+                setExpandedLibraryItem={handleExpand}
                 quickAddForm={quickAddForm}
                 setQuickAddForm={setQuickAddForm}
                 handleQuickAdd={handleQuickAdd}
@@ -176,7 +154,6 @@ export function VirtualizedExerciseList({
             </div>
           ))}
           
-          {/* Bottom spacer to ensure scrollbar has correct size */}
           <div style={{ height: Math.max(0, totalHeight - paddingTop - (visibleItems.length * itemHeight)) }} />
         </>
       )}

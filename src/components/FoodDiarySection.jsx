@@ -1,7 +1,6 @@
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
@@ -226,16 +225,7 @@ export function FoodDiarySection({
             <div className="mt-4 space-y-2">
               <div className="flex justify-start items-center mb-2">
                 <h3 className="font-medium text-gray-900 text-lg dark:text-white">Search Results</h3>
-                {/* <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSearchResults([]);
-                    setNewFood("");
-                  }}
-                  className="mt-px ml-1 h-5 w-5 dark:text-white hover:text-red-500 bg-transparent hover:bg-transparent"
-                >
-                  <FiX className="min-h-5 min-w-5" />
-                </Button> */}
+             
               </div>
               {searchResults.map((food) => {
                 const defaultServing = food.servings.find((s) => s.default) || food.servings[0];

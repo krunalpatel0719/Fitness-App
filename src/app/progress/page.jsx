@@ -11,7 +11,6 @@ import { format, startOfDay, endOfDay, addDays, subDays, differenceInDays } from
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Import analytics components
 import { NutritionMetrics } from "@/components/analytics/NutritionMetrics";
 import { WorkoutMetrics } from "@/components/analytics/WorkoutMetrics";
 
@@ -27,11 +26,7 @@ export default function ProgressPage() {
   const [activeTab, setActiveTab] = useState("nutrition");
   const [dateRange, setDateRange] = useState({ start: null, end: null });
 
-  // Cache key for local storage
-  const CACHE_KEY_PREFIX = "fitness_analytics_";
-  const CACHE_DURATION = 3600000; // 1 hour
 
-  // Calculate date range based on timeframe and offset
   const calculateDateRange = useCallback(() => {
     const now = new Date();
     let startDate, endDate;
@@ -147,10 +142,8 @@ export default function ProgressPage() {
       if (!userLoggedIn || !currentUser?.uid) return;
       
       try {
-        // Calculate the current date range
         const { start: currentStart, end: currentEnd } = calculateDateRange();
         
-        // Calculate the previous period date range for comparison
         const previousPeriodEnd = new Date(currentStart);
         previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 1);
         
@@ -159,7 +152,6 @@ export default function ProgressPage() {
         previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
         
         
-        // Query for exercise logs
         const exerciseLogsQuery = query(
           collection(db, "exercise_logs"),
           where("userId", "==", currentUser.uid),
@@ -217,10 +209,8 @@ export default function ProgressPage() {
     }
   };
 
-  // Check if user is authenticated
   if (!userLoggedIn) return null;
 
-  // Time period options in Apple Health style
   const timeOptions = [
     { value: "day", label: "D" },
     { value: "week", label: "W" },
@@ -239,14 +229,13 @@ export default function ProgressPage() {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Health Summary
             </h1>
-            {/* Apple-style time selector */}
             <div className="flex items-center justify-center  bg-white dark:bg-zinc-800 rounded-full p-1 shadow-sm ">
               {timeOptions.map(option => (
                 <button
                   key={option.value}
                   onClick={() => {
                     setTimeframe(option.value);
-                    setTimeOffset(0); // Reset offset when changing timeframe
+                    setTimeOffset(0);
                   }}
                   className={` px-4 py-1.5 text-sm font-medium rounded-full transition-all ${
                     timeframe === option.value 

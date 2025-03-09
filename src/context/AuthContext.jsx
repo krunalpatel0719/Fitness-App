@@ -27,19 +27,25 @@ export function AuthProvider({ children }) {
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userProfile, setUserProfile] = useState({});
+  const [profileUpdated, setProfileUpdated] = useState(0);
 
-  // Add update profile function
-  const updateProfile = async (profileData) => {
+  const updateUserProfile = async (profileData) => {
     if (!currentUser) {
       throw new Error("No user is signed in");
     }
     
     try {
-      await firebaseUpdateProfile(currentUser, profileData);
-      setCurrentUser({
-        ...currentUser,
+      // Update Firebase profile
+      await firebaseUpdateProfile(auth.currentUser, profileData);
+     
+      setUserProfile(prev => ({
+        ...prev,
         ...profileData
-      });
+      }));
+      
+      // Force UI updates
+      setProfileUpdated(prev => prev + 1);
       return true;
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -53,14 +59,19 @@ export function AuthProvider({ children }) {
       try {
         if (user) {
           setCurrentUser(user);
+          
+          setUserProfile({
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL
+          });
 
-          // Check if the user signed in using email/password
+          // Provider checks
           const isEmail = user.providerData.some(
             (provider) => provider.providerId === "password"
           );
           setIsEmailUser(isEmail);
 
-          // Check if the user signed in with Google
           const isGoogle = user.providerData.some(
             (provider) =>
               provider.providerId === GoogleAuthProvider.PROVIDER_ID
@@ -70,6 +81,7 @@ export function AuthProvider({ children }) {
           setUserLoggedIn(true);
         } else {
           setCurrentUser(null);
+          setUserProfile({});
           setUserLoggedIn(false);
         }
       } catch (err) {
@@ -85,13 +97,14 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       currentUser,
+      userProfile,
       userLoggedIn,
       isEmailUser,
       isGoogleUser,
       error,
-      updateProfile, // Add the updateProfile function to context
+      updateUserProfile,
     }),
-    [currentUser, userLoggedIn, isEmailUser, isGoogleUser, error]
+    [currentUser, userProfile, userLoggedIn, isEmailUser, isGoogleUser, error, profileUpdated]
   );
 
   return (

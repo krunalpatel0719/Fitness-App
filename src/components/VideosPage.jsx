@@ -54,10 +54,8 @@ export default function VideosPage() {
     }
   });
   
-  // Set a featured video when data loads
   useEffect(() => {
     if (channels && channels.length > 0 && channels[0].videos && channels[0].videos.length > 0) {
-      // Use the first video from the first channel as the featured video
       setFeaturedVideo({
         ...channels[0].videos[0],
         channelTitle: channels[0].channelTitle,
@@ -110,7 +108,6 @@ export default function VideosPage() {
               height="100%"
               src={`https://www.youtube.com/embed/${selectedVideo.id}?autoplay=1`}
               title={selectedVideo.title}
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full"

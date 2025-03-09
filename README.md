@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Fitness App
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It is an open-source application for tracking fitness data, including nutrition and exercise metrics, and displays progress analytics in real time.
+
+## Features
+
+- **User Authentication:** Uses Firebase Authentication.
+- **Data Analytics:** Tracks nutrition and exercise data with aggregated analytics.
+- **Progress Dashboard:** Visualizes data via charts with optimized Firestore queries.
+- **Integration:** Connects with external APIs including FatSecret for food data and a free exercise database.
 
 ## Getting Started
 
-First, run the development server:
+### Installation
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Clone the repository:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   git clone https://github.com/TaleOfScripting/fitness-app.git
+   cd fitness-app
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+2. Install depedencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    npm install
+    # or 
+    yarn install
+3. Create an .env.local file, an example of the contents is here:
 
-## Learn More
+    NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
+    FATSECRET_CLIENT_ID=your_fatsecret_client_id
+    FATSECRET_CLIENT_SECRET=your_fatsecret_client_secret
 
-To learn more about Next.js, take a look at the following resources:
+4. To start the deployment server run:
+    npm run dev
+    # or 
+    yarn dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open http://localhost:3000 with your browser to see your app in action.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Special Thanks
+FatSecret: Special thanks to FatSecret for providing access to their API https://www.fatsecret.com/.
+Free Exercise Database: Special thanks to yuhonas for this free exercise database https://github.com/yuhonas/free-exercise-db.

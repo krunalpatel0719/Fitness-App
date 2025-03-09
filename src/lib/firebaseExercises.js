@@ -37,12 +37,10 @@ function categorizeExercise(exerciseName) {
 
 
 function getExerciseData(exerciseName) {
-  // Load exercises only once and cache them
   if (cachedExercises === null) {
     cachedExercises = getAllExercises();
   }
   
-  // Find the exercise in the cached data
   return cachedExercises.find(ex => ex.name === exerciseName);
 }
 
@@ -62,7 +60,6 @@ export async function addOrUpdateExerciseLog(userId, exerciseData, selectedDate)
   
 
   const dateStr = format(selectedDate, "yyyy-MM-dd");
-  // Check for existing exercise log with same name today
   const q = query(
     collection(db, EXERCISE_LOGS_COL),
     where("userId", "==", userId),

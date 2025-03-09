@@ -36,7 +36,6 @@
         if (!tokenResponse.ok) throw new Error("Token error");
         const tokenData = await tokenResponse.json();
         
-        // Call food.get.v2 method
         const apiUrl = new URL("https://platform.fatsecret.com/rest/server.api");
         apiUrl.searchParams.set("method", "food.get.v4");
         apiUrl.searchParams.set("food_id", foodId);
@@ -55,7 +54,7 @@
         
 
        
-        // Format response
+ 
         const formattedFood = {
           food_id: foodData.food.food_id,
           food_name: foodData.food.food_name,
@@ -80,11 +79,9 @@
             added_sugar:  Number(serving.added_sugar),
             vitamin_d:  Number(serving.vitamin_d),
             calcium:  Number(serving.calcium),
-            iron:  Number(serving.iron),
             vitamin_a:  Number(serving.vitamin_a),
             vitamin_c:  Number(serving.vitamin_c),
             iron:  Number(serving.iron),
-
             metric_serving_amount: serving.metric_serving_amount,
             metric_serving_unit: serving.metric_serving_unit,
             number_of_units: serving.number_of_units,
@@ -107,12 +104,6 @@
       }
     }
 
-  // if (!searchQuery) {
-  //   return new Response(
-  //     JSON.stringify({ error: "Missing search query parameter" }),
-  //     { status: 400, headers: { "Content-Type": "application/json" } }
-  //   );
-  // }
 
   if (searchQuery) {
   try {
@@ -120,7 +111,7 @@
       grant_type: "client_credentials",
       client_id: process.env.FATSECRET_CLIENT_ID,
       client_secret: process.env.FATSECRET_CLIENT_SECRET,
-      scope: "premier"  // Use space-delimited scopes, not comma-delimited.
+      scope: "premier" 
     });
 
     const tokenResponse = await fetch("https://oauth.fatsecret.com/connect/token", {
@@ -146,27 +137,8 @@
       );
     }
 
-    // Build URL for foods.search using method-based integration
-
-
     const apiUrl = new URL("https://platform.fatsecret.com/rest/server.api");
 
-    
-   
-
-    // Update the foods.search API call
-    // apiUrl.searchParams.set("method", "foods.search");
-    // apiUrl.searchParams.set("search_expression", searchQuery);
-    // apiUrl.searchParams.set("page_number", page); // Add this line
-    // apiUrl.searchParams.set("max_results", "10");
-    
-    
-    // apiUrl.searchParams.set("search_expression", searchQuery);
-    // apiUrl.searchParams.set("format", "json");
-    // apiUrl.searchParams.set("max_results", "10");
-
-   
-    
     // V3 parameters
     apiUrl.searchParams.set("method", "foods.search.v3");
     apiUrl.searchParams.set("search_expression", searchQuery);
@@ -179,7 +151,6 @@
     apiUrl.searchParams.set("language", "en");
 
 
-    // Use POST for the request
     const apiResponse = await fetch(apiUrl.toString(), {
       method: "POST",
       headers: {
@@ -225,7 +196,6 @@
             added_sugar: serving.added_sugar,
             vitamin_d: serving.vitamin_d,
             calcium: serving.calcium,
-            iron: serving.iron,
             vitamin_a: serving.vitamin_a,
             vitamin_c: serving.vitamin_c,
             iron: serving.iron,
@@ -236,7 +206,7 @@
             default: serving.is_default === "1"
           }))
         })) || [],
-        page_number: parseInt(foodData.foods_search.page_number) + 1, // Convert to 1-based
+        page_number: parseInt(foodData.foods_search.page_number) + 1, 
         total_results: parseInt(foodData.foods_search.total_results),
         total_pages: Math.ceil(parseInt(foodData.foods_search.total_results) / parseInt(foodData.foods_search.max_results))
       }

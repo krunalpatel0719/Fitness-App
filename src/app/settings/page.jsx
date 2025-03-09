@@ -97,7 +97,6 @@ export default function SettingsPage() {
         </div>
       </main>
 
-      {/* Metrics Dialog */}
       <Dialog open={openMetricsDialog} onOpenChange={setOpenMetricsDialog}>
         <DialogContent hideClose={true} className="dark:bg-zinc-900 border border-zinc-700">
           <DialogHeader>

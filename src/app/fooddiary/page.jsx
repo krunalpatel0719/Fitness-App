@@ -61,7 +61,6 @@ export default function FoodDiary() {
       return;
     }
 
-    // Load user metrics once on page load
     const loadMetrics = async () => {
       try {
         const docRef = doc(db, "user_metrics", currentUser.uid);
@@ -74,7 +73,6 @@ export default function FoodDiary() {
       }
     };
 
-    // Realtime listener for today's food log based on selectedDate
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     const q = query(
       collection(db, "food_logs"),
@@ -114,7 +112,6 @@ export default function FoodDiary() {
     const weightKg = parseFloat(metrics.weight) * 0.453592;
     const heightCm = parseFloat(metrics.feet) * 30.48 + parseFloat(metrics.inches) * 2.54;
 
-    // Mifflin-St Jeor Equation (metric)
     let bmr = 10 * weightKg + 6.25 * heightCm - 5 * parseFloat(metrics.age);
     bmr += metrics.gender === "male" ? 5 : -161;
 
@@ -128,7 +125,6 @@ export default function FoodDiary() {
 
     const tdee = bmr * activityMultipliers[metrics.activityLevel];
 
-    // Adjust for goal: subtract 500 for weight loss, add 500 for weight gain
     
     switch (metrics.goal) {
       case "lose":
@@ -157,7 +153,6 @@ export default function FoodDiary() {
     const numericAmount = parseFloat(amount);
     const nonPluralUnits = ['g', 'oz', 'ml', 'kg', 'lb', 'mg', 'dl', 'cl'];
   
-    // Helper function to check if word should be pluralized
     const shouldPluralize = (word) => {
       const endsWithNonPluralUnit = nonPluralUnits.some(unit => 
         word.toLowerCase().endsWith(unit.toLowerCase())
@@ -165,7 +160,6 @@ export default function FoodDiary() {
       return !endsWithNonPluralUnit && numericAmount > 1 && !word.endsWith('s');
     };
   
-    // Helper function to pluralize text
     const pluralize = (text) => {
       const words = text.trim().split(' ');
       const lastWord = words[words.length - 1];
@@ -176,34 +170,28 @@ export default function FoodDiary() {
       return words.join(' ');
     };
   
-    // Handle "serving" case
     if (type.toLowerCase().includes('serving')) {
       return `${numericAmount} ${numericAmount > 1 ? 'Servings' : 'Serving'}`;
     }
   
-    // Check if type starts with a number (e.g., "1 cup", "2 slices")
     const typeMatch = type.match(/^(\d+(\.\d+)?)\s+(.+)$/);
     if (typeMatch) {
       const [_, typeAmount, __, description] = typeMatch;
       const totalAmount = numericAmount * parseFloat(typeAmount);
   
-      // Handle text with parentheses
       if (description.includes('(')) {
         const [mainText, parenthetical] = description.split(/\s*(\(.*\))/);
         return `${totalAmount} ${pluralize(mainText)} ${parenthetical}`;
       }
   
-      // Handle standard text
       return `${totalAmount} ${pluralize(description)}`;
     }
   
-    // Handle type without leading number
     if (type.includes('(')) {
       const [mainText, parenthetical] = type.split(/\s*(\(.*\))/);
       return `${numericAmount} ${pluralize(mainText)} ${parenthetical}`;
     }
   
-    // Handle basic cases
     return `${numericAmount} ${pluralize(type)}`;
   };
 
@@ -244,7 +232,7 @@ export default function FoodDiary() {
       if (results && results.food) {
         console.log(results.food);
         console.log(results.servings);
-        setSearchResults(results.food); // Set the raw food array
+        setSearchResults(results.food); 
         setTotalPages(Math.ceil(parseInt(results.total_results) / 10));
         setCurrentPage(parseInt(results.page_number));
       }
@@ -368,8 +356,7 @@ export default function FoodDiary() {
         createdAt: new Date(),
       };
       await addDoc(collection(db, "food_logs"), foodLogEntry);
-      // setSearchResults([]);
-      // setNewFood("");
+     
     } catch (error) {
       console.error("Quick add error:", error);
       alert("Failed to add food item");
@@ -380,11 +367,9 @@ export default function FoodDiary() {
   
   const handleEditFood = async (updatedFood) => {
     try {
-      // Get the selected serving from the servings array
       const selectedServing = updatedFood.servings.find(s => 
         s.description === updatedFood.servingType
       ) || {
-        // Fallback values if no matching serving is found
         calories: updatedFood.baseCalories,
         protein: updatedFood.baseProtein,
         carbs: updatedFood.baseCarbs,
@@ -536,16 +521,13 @@ export default function FoodDiary() {
   const formatServing = (serving) => {
     if (!serving) return "";
     
-    // Prioritize metric information
     const metric = `${serving.metric_serving_amount || ''} ${serving.metric_serving_unit || ''}`.trim();
     const description = serving.description || '';
   
-    // If description contains metric info, just use description
     if (description.toLowerCase().includes(metric.toLowerCase())) {
       return description;
     }
   
-    // Combine description and metric if both exist
     return [description, metric].filter(Boolean).join(" - ");
   };
   

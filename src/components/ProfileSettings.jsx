@@ -9,15 +9,17 @@ import { AtSign, User, Camera, Pencil } from "lucide-react";
 
 
 export function ProfileSettings() {
-  const { currentUser, updateProfile } = useAuth();
+  const { currentUser, userProfile, updateUserProfile } = useAuth();
+
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Parse displayName into first and last name
   const parseNameParts = () => {
-    if (!currentUser?.displayName) return { firstName: '', lastName: '' };
-    const nameParts = currentUser.displayName.split(' ');
+    const displayName = userProfile?.displayName || currentUser?.displayName;
+    if (!displayName) return { firstName: '', lastName: '' };
+    
+    const nameParts = displayName.split(' ');
     return {
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || ''
@@ -32,7 +34,6 @@ export function ProfileSettings() {
     previewURL: null
   });
   
-  // Load user data when component mounts or currentUser changes
   useEffect(() => {
     if (currentUser) {
       const { firstName, lastName } = parseNameParts();
@@ -40,12 +41,11 @@ export function ProfileSettings() {
         firstName,
         lastName,
         email: currentUser.email || '',
-        photoURL: currentUser.photoURL || '',
+        photoURL: currentUser.photoURL || userProfile.photoURL || '',
         previewURL: null
       });
     }
-  }, [currentUser]);
-
+  }, [currentUser, userProfile])
  
 
 
@@ -56,16 +56,13 @@ export function ProfileSettings() {
     try {
       
       
-      // Create full name from first and last name
       const displayName = `${formData.firstName} ${formData.lastName}`.trim();
       
-      // Update profile in Firebase
-      await updateProfile({
+      await updateUserProfile({
         displayName,
        
       });
       
-      // Don't update local state here, let the auth state listener handle it
      
       setIsEditing(false);
       
@@ -164,7 +161,6 @@ export function ProfileSettings() {
                   variant=""
                   className="flex-1 border-gray-700 dark:text-black dark:bg-zinc-100 hover:bg-zinc-800 hover:dark:bg-zinc-300"
                   onClick={() => {
-                    // Reset form to current user data
                     const { firstName, lastName } = parseNameParts();
                     setFormData({
                       firstName,

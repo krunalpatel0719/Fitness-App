@@ -3,9 +3,6 @@ import { getAuth, GoogleAuthProvider} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Keep your existing firebase initialization code
-
-// After initializing your firebase app and auth, add this line:
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

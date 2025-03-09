@@ -1,10 +1,8 @@
 import { fetchYouTubeVideos } from '@/lib/youtube';
 import { NextResponse } from 'next/server';
 
-// Cache duration in seconds (6 hours)
 export const revalidate = 21600;
 
-// In-memory cache (will persist until server restart)
 let cachedData = null;
 let cacheTime = null;
 
@@ -12,12 +10,12 @@ export async function GET() {
   const apiKey = process.env.YOUTUBE_API_KEY;
   
   const channelIds = [
-    'UC68TLK0mAEzUyHx5x5k-S1Q', // Google Developers
-    'UCERm5yFZ1SptUEU4wZ2vJvw', // Jeremy Ethier
+    'UC68TLK0mAEzUyHx5x5k-S1Q',
+    'UCERm5yFZ1SptUEU4wZ2vJvw', 
     'UCfQgsKhHjSyRLOp9mnffqVg',
     'UCB2wtYpfbCpYDc5TeTwuqFA',
     'UCEjIjshJ8bvvCkGNk0pkYcA',
-    'UCe0TLA0EsQbE-MjuHXevj2A', // Athlean-X
+    'UCe0TLA0EsQbE-MjuHXevj2A',
     'UCCgLoMYIyP0U56dEhEL1wXQ',
     'UCaBqRxHEMomgFU-AkSfodCw', 
     'UCiP6wD_tYlYLYh3agzbByWQ',
@@ -33,7 +31,6 @@ export async function GET() {
 
 
   try {
-    // Check if we have valid cached data (cache for 6 hours)
     const now = Date.now();
     if (cachedData && cacheTime && (now - cacheTime < revalidate * 1000)) {
       return NextResponse.json(cachedData);
@@ -41,14 +38,12 @@ export async function GET() {
     
     const data = await fetchYouTubeVideos(apiKey, channelIds);
     
-    // Update the cache
     cachedData = data;
     cacheTime = now;
     
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching YouTube data:', error);
-    // If we have stale cache, return it during errors rather than failing
     if (cachedData) {
       return NextResponse.json(cachedData);
     }

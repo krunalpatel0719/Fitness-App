@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings, LogOut, User } from "lucide-react";
 
 export function ProfileDropdown({ hamburgerMode = false }) {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
@@ -44,7 +44,6 @@ export function ProfileDropdown({ hamburgerMode = false }) {
   }
  
   
-  // Then in your AvatarFallback:
 
   return (
     <DropdownMenu>
@@ -55,12 +54,12 @@ export function ProfileDropdown({ hamburgerMode = false }) {
         >
           <Avatar className="h-8 w-8 transition-transform hover:scale-105">
             <AvatarImage 
-              src={currentUser?.photoURL} 
-              alt={currentUser?.displayName} 
+              src={userProfile?.photoURL} 
+              alt={userProfile?.displayName} 
               className="object-cover"
             />
             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-medium">
-              {getInitials(currentUser?.displayName)}
+              {getInitials(userProfile?.displayName)}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -72,10 +71,10 @@ export function ProfileDropdown({ hamburgerMode = false }) {
         <DropdownMenuLabel className="px-2 py-2">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {currentUser?.displayName}
+              {userProfile?.displayName}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {currentUser?.email}
+              {userProfile?.email}
             </p>
           </div>
         </DropdownMenuLabel>

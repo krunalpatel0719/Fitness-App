@@ -76,15 +76,7 @@ export function WorkoutLog({ selectedDate }) {
     return () => unsubscribe();
   }, [currentUser, selectedDate]);
 
-  // const handleLoadMore = () => {
-  //   if (isLoading) return;
 
-  //   setIsLoading(true);
-  //   setTimeout(() => {
-  //     setCurrentPage(prev => prev + 1);
-  //     setIsLoading(false);
-  //   }, 300);
-  // };
 
   const toggleExercise = (exerciseId) => {
     setExpandedExercises((prev) =>
@@ -94,25 +86,6 @@ export function WorkoutLog({ selectedDate }) {
     );
   };
 
-  // useEffect(() => {
-  //   const handleScroll = (e) => {
-  //     const container = e.target;
-  //     if (container.scrollHeight - container.scrollTop - container.clientHeight < 100) {
-  //       handleLoadMore();
-  //     }
-  //   };
-
-  //   const scrollContainer = document.querySelector('.exercise-library-container');
-  //   if (scrollContainer) {
-  //     scrollContainer.addEventListener('scroll', handleScroll);
-  //   }
-
-  //   return () => {
-  //     if (scrollContainer) {
-  //       scrollContainer.removeEventListener('scroll', handleScroll);
-  //     }
-  //   };
-  // }, [isLoading]);
 
   const filteredExercises = exerciseLibrary.filter((exercise) => {
     const query = searchQuery.toLowerCase();
@@ -126,7 +99,6 @@ export function WorkoutLog({ selectedDate }) {
     );
   });
 
-  // const pagedExercises = filteredExercises.slice(0, currentPage * exercisesPerPage);
 
   const handleAddExercise = async (e) => {
     e.preventDefault();
@@ -171,7 +143,6 @@ export function WorkoutLog({ selectedDate }) {
         weight: "",
       });
     } else {
-      // Find the exercise and set form values
       const selectedExercise = exerciseLibrary.find(
         (ex) => ex.id === exerciseId
       ) || { name: "Unknown exercise" };
@@ -200,7 +171,6 @@ export function WorkoutLog({ selectedDate }) {
       return;
     }
 
-    // Create sets array
     const newSets = Array.from({ length: parsedSets }, (_, i) => ({
       weight: parsedWeight,
       reps: parsedReps,
@@ -217,7 +187,6 @@ export function WorkoutLog({ selectedDate }) {
         selectedDate
       );
 
-      // Reset form after successful submission
       setQuickAddForm({
         exerciseId: null,
         name: "",
@@ -409,7 +378,6 @@ export function WorkoutLog({ selectedDate }) {
           ))}
         </div>
         {/* Exercise Library */}
-        {/* Exercise Library */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -425,10 +393,9 @@ export function WorkoutLog({ selectedDate }) {
                 onChange={(e) => {
                   const value = e.target.value;
                   setSearchQuery(value);
-                  setCurrentPage(1); // Always reset to first page when search changes
-                  setExpandedLibraryItem(null); // Close any expanded items when search changes
+                  setCurrentPage(1); 
+                  setExpandedLibraryItem(null); 
                 }}
-                className="rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 focus-visible:border-transparent"
            
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 focus-visible:border-transparent"
               />
@@ -436,7 +403,7 @@ export function WorkoutLog({ selectedDate }) {
           </div>
           <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
           <VirtualizedExerciseList
-              key={`exercise-list-${searchQuery}`} // Add this key to force remount on search change
+              key={`exercise-list-${searchQuery}`} 
               exercises={filteredExercises}
               expandedLibraryItem={expandedLibraryItem}
               setExpandedLibraryItem={setExpandedLibraryItem}
