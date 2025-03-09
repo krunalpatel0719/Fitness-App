@@ -36,11 +36,9 @@ export async function GET() {
     // Check if we have valid cached data (cache for 6 hours)
     const now = Date.now();
     if (cachedData && cacheTime && (now - cacheTime < revalidate * 1000)) {
-      console.log('Serving YouTube data from cache');
       return NextResponse.json(cachedData);
     }
     
-    console.log('Fetching fresh YouTube data');
     const data = await fetchYouTubeVideos(apiKey, channelIds);
     
     // Update the cache
@@ -52,7 +50,6 @@ export async function GET() {
     console.error('Error fetching YouTube data:', error);
     // If we have stale cache, return it during errors rather than failing
     if (cachedData) {
-      console.log('Error occurred, falling back to stale cache');
       return NextResponse.json(cachedData);
     }
     return NextResponse.json(

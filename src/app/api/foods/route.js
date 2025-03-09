@@ -198,7 +198,6 @@
     }
 
     const foodData = await apiResponse.json();
-    console.log("Raw foodData:", foodData);
 
     const formattedResponse = {
       foods: {

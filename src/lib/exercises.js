@@ -12,7 +12,6 @@ export const getAllExercises = () => {
         category: exercise.category,
         primaryMuscles: exercise.primaryMuscles || [],
         secondaryMuscles: exercise.secondaryMuscles || [],
-        // Add this property to fix the search
         muscleGroups: [...(exercise.primaryMuscles || []), ...(exercise.secondaryMuscles || [])],
         instructions: exercise.instructions || [],
         images: Array.isArray(exercise.images) 

@@ -1,9 +1,7 @@
-//src/components/MetricsForm
-
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,207 +28,152 @@ export function MetricsForm({ onSubmit, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const processedData = {
-        ...formData,
-        feet: parseFloat(formData.feet),
-        inches: parseFloat(formData.inches),
-        weight: parseFloat(formData.weight),
-        age: parseFloat(formData.age),
-        gender: formData.gender,
-        activityLevel: formData.activityLevel,
-        goal: formData.goal
-      };
-      onSubmit(processedData);
+      ...formData,
+      feet: parseFloat(formData.feet),
+      inches: parseFloat(formData.inches),
+      weight: parseFloat(formData.weight),
+      age: parseFloat(formData.age),
+      gender: formData.gender,
+      activityLevel: formData.activityLevel,
+      goal: formData.goal
+    };
+    onSubmit(processedData);
   };
 
   return (
-    <Card className="dark:bg-zinc-800 max-w-2xl mx-auto ">
-      <CardHeader>
-        <CardTitle className="dark:text-white text-2xl">
-          Set Up Your Profile
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Height inputs: Feet and Inches */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label className="dark:text-gray-300 text-sm md:text-md">
-                Height (ft)
-              </Label>
-              <Input
-                type="number"
-                className="focus:border-black"
-                required
-                value={formData.feet}
-                onChange={(e) =>
-                  setFormData({ ...formData, feet: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="dark:text-gray-300 text-sm md:text-md">
-                Height (in)
-              </Label>
-              <Input
-                type="number"
-                className="focus:border-black"
-                required
-                value={formData.inches}
-                onChange={(e) =>
-                  setFormData({ ...formData, inches: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          {/* Weight (lb) */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300 text-sm md:text-md">
-              Weight (lb)
-            </Label>
-            <Input
-              type="number"
-              className="focus:border-black"
-              required
-              value={formData.weight}
-              onChange={(e) =>
-                setFormData({ ...formData, weight: e.target.value })
-              }
-            />
-          </div>
-
-          {/* Age */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300 text-sm md:text-md">
-              Age
-            </Label>
-            <Input
-              type="number"
-              className="focus:border-black"
-              required
-              value={formData.age}
-              onChange={(e) =>
-                setFormData({ ...formData, age: e.target.value })
-              }
-            />
-          </div>
-
-          {/* Gender */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300 text-sm md:text-md">
-              Gender
-            </Label>
-            <Select
-              value={formData.gender}
-              onValueChange={(value) =>
-                setFormData({ ...formData, gender: value })
-              }
-            >
-              <SelectTrigger className="w-full dark:bg-zinc-800 dark:text-white focus:border-blue-500">
-                <SelectValue placeholder="Select gender" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-800">
-                <SelectItem
-                  value="male"
-                  className="dark:text-white text-sm md:text-md"
+    <div className="w-full ">
+      <CardContent className="p-4 ">
+        <div className="grid gap-8 ">
+    
+          
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+             
+              <div className = "bg-zinc-800/70 p-4 rounded-lg" >
+                <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-xl font-semibold text-white">Body Metrics</h2>
+               </div>
+              {/* Height Section with Feet and Inches */}
+              <div className="grid grid-cols-2 gap-4 mb-4 ">
+                <div className="space-y-2">
+                  <Label htmlFor="feet" className="text-zinc-400">Height (ft)</Label>
+                  <Input 
+                    id="feet"
+                    type="number" 
+                    placeholder="5"
+                    required
+                    value={formData.feet}
+                    onChange={(e) => setFormData({ ...formData, feet: e.target.value })}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inches" className="text-zinc-400">Height (in)</Label>
+                  <Input 
+                    id="inches"
+                    type="number" 
+                    placeholder="10"
+                    required
+                    value={formData.inches}
+                    onChange={(e) => setFormData({ ...formData, inches: e.target.value })}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </div>
+              </div>
+              
+              {/* Weight Field */}
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="weight" className="text-zinc-400">Weight (lb)</Label>
+                <Input 
+                  id="weight"
+                  type="number" 
+                  placeholder="165" 
+                  required
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700 text-white"
+                />
+              </div>
+              
+              {/* Age Field */}
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="age" className="text-zinc-400">Age</Label>
+                <Input 
+                  id="age"
+                  type="number" 
+                  placeholder="30" 
+                  required
+                  value={formData.age}
+                  onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700 text-white"
+                />
+              </div>
+              
+              {/* Gender Select */}
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="gender" className="text-zinc-400">Gender</Label>
+                <Select 
+                  value={formData.gender} 
+                  onValueChange={(value) => setFormData({ ...formData, gender: value })}
                 >
-                  Male
-                </SelectItem>
-                <SelectItem
-                  value="female"
-                  className="dark:text-white text-sm md:text-md"
+                  <SelectTrigger id="gender" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectItem value="male" className="text-white">Male</SelectItem>
+                    <SelectItem value="female" className="text-white">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Activity Level Select */}
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="activity-level" className="text-zinc-400">Activity Level</Label>
+                <Select 
+                  value={formData.activityLevel} 
+                  onValueChange={(value) => setFormData({ ...formData, activityLevel: value })}
                 >
-                  Female
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Activity Level */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300 text-sm md:text-md">
-              Activity Level
-            </Label>
-            <Select
-              value={formData.activityLevel}
-              onValueChange={(value) =>
-                setFormData({ ...formData, activityLevel: value })
-              }
-            >
-              <SelectTrigger className="w-full dark:bg-zinc-800 dark:text-white focus:border-blue-500">
-                <SelectValue placeholder="Select activity level" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-800">
-                <SelectItem
-                  value="sedentary"
-                  className="dark:text-white text-sm md:text-md"
+                  <SelectTrigger id="activity-level" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Select activity level" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectItem value="sedentary" className="text-white">Sedentary (little or no exercise)</SelectItem>
+                    <SelectItem value="lightlyActive" className="text-white">Lightly active (light exercise 1-3 days/week)</SelectItem>
+                    <SelectItem value="active" className="text-white">Moderately active (moderate exercise 3-5 days/week)</SelectItem>
+                    <SelectItem value="veryActive" className="text-white">Very active (hard exercise 6-7 days/week)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Goal Select */}
+              <div className="space-y-2 mb-6">
+                <Label htmlFor="goal" className="text-zinc-400">Goal</Label>
+                <Select 
+                  value={formData.goal} 
+                  onValueChange={(value) => setFormData({ ...formData, goal: value })}
                 >
-                  Sedentary
-                </SelectItem>
-                <SelectItem
-                  value="lightlyActive"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Lightly Active
-                </SelectItem>
-                <SelectItem
-                  value="active"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Active
-                </SelectItem>
-                <SelectItem
-                  value="veryActive"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Very Active
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Goal */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300 text-sm md:text-md">
-              Goal
-            </Label>
-            <Select
-              value={formData.goal}
-              onValueChange={(value) =>
-                setFormData({ ...formData, goal: value })
-              }
-            >
-              <SelectTrigger className="w-full dark:bg-zinc-800 dark:text-white focus:border-blue-500">
-                <SelectValue placeholder="Select goal" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-zinc-800">
-                <SelectItem
-                  value="lose"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Lose Weight
-                </SelectItem>
-                <SelectItem
-                  value="maintain"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Maintain Weight
-                </SelectItem>
-                <SelectItem
-                  value="gain"
-                  className="dark:text-white text-sm md:text-md"
-                >
-                  Gain Weight
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500">
-            Calculate My Calories
-          </Button>
-        </form>
+                  <SelectTrigger id="goal" className="bg-zinc-800 border-zinc-700 text-white">
+                    <SelectValue placeholder="Select goal" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-800 border-zinc-700">
+                    <SelectItem value="lose" className="text-white">Lose Weight</SelectItem>
+                    <SelectItem value="maintain" className="text-white">Maintain Weight</SelectItem>
+                    <SelectItem value="gain" className="text-white">Gain Weight</SelectItem>
+                  </SelectContent>
+                </Select>
+                </div>
+              </div>
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                Calculate My Calories
+              </Button>
+            </form>
+   
+        </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

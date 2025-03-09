@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 "use client";
 
 import React, {
@@ -9,7 +8,11 @@ import React, {
   useMemo,
 } from "react";
 import { auth } from "../lib/firebase";
-import { onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
+import { 
+  onAuthStateChanged, 
+  GoogleAuthProvider, 
+  updateProfile as firebaseUpdateProfile 
+} from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -24,6 +27,26 @@ export function AuthProvider({ children }) {
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Add update profile function
+  const updateProfile = async (profileData) => {
+    if (!currentUser) {
+      throw new Error("No user is signed in");
+    }
+    
+    try {
+      await firebaseUpdateProfile(currentUser, profileData);
+      setCurrentUser({
+        ...currentUser,
+        ...profileData
+      });
+      return true;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setError(error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -66,6 +89,7 @@ export function AuthProvider({ children }) {
       isEmailUser,
       isGoogleUser,
       error,
+      updateProfile, // Add the updateProfile function to context
     }),
     [currentUser, userLoggedIn, isEmailUser, isGoogleUser, error]
   );

@@ -14,11 +14,53 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import { format } from "date-fns";
+import { getAllExercises } from "@/lib/exercises";
 const EXERCISE_LOGS_COL = "exercise_logs";
+let cachedExercises = null;
+
+
+function categorizeExercise(exerciseName) {
+  if (!exerciseName) return "Other";
+  
+  const name = exerciseName.toLowerCase();
+  
+  if (/bench|chest|push[ -]?up|fly|press|dip/.test(name)) return "Chest";
+  if (/back|row|pull[ -]?up|pulldown|deadlift|lat/.test(name)) return "Back";
+  if (/squat|leg|calf|lunge|hamstring|quad|glute/.test(name)) return "Legs";
+  if (/shoulder|delt|military|overhead|press|shrug/.test(name)) return "Shoulders";
+  if (/bicep|tricep|curl|extension|arm/.test(name)) return "Arms";
+  if (/ab|core|crunch|sit[ -]?up|plank/.test(name)) return "Core";
+  if (/run|jog|sprint|cardio|bike|cycling|treadmill|elliptical|rowing/.test(name)) return "Cardio";
+  
+  return "Other";
+}
+
+
+function getExerciseData(exerciseName) {
+  // Load exercises only once and cache them
+  if (cachedExercises === null) {
+    cachedExercises = getAllExercises();
+  }
+  
+  // Find the exercise in the cached data
+  return cachedExercises.find(ex => ex.name === exerciseName);
+}
+
 
 export async function addOrUpdateExerciseLog(userId, exerciseData, selectedDate) {
   
+  const fullExerciseData = getExerciseData(exerciseData.name); 
+  let primaryMuscles = fullExerciseData?.primaryMuscles || [];
+  let secondaryMuscles = fullExerciseData?.secondaryMuscles || [];
+
+
+  if (!fullExerciseData || primaryMuscles.length === 0) {
+    const muscleGroup = categorizeExercise(exerciseData.name);
+    primaryMuscles = [muscleGroup];
     
+  }
+  
+
   const dateStr = format(selectedDate, "yyyy-MM-dd");
   // Check for existing exercise log with same name today
   const q = query(
@@ -47,6 +89,11 @@ export async function addOrUpdateExerciseLog(userId, exerciseData, selectedDate)
       sets: [...existingData.sets, ...newSets],
       totalVolume,
       updatedAt: new Date(),
+      ...((!existingData.primaryMuscles || existingData.primaryMuscles.length === 0) && { primaryMuscles }),
+    ...((!existingData.secondaryMuscles || existingData.secondaryMuscles.length === 0) && { secondaryMuscles }),
+  
+     
+
     });
     return existingDoc.ref.id;
   }
@@ -60,6 +107,8 @@ export async function addOrUpdateExerciseLog(userId, exerciseData, selectedDate)
     date: format(selectedDate, "yyyy-MM-dd"),
     createdAt: new Date(),
     updatedAt: new Date(),
+    primaryMuscles,
+    secondaryMuscles,
   });
   
   return docRef.id;

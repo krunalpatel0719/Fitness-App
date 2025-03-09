@@ -1,5 +1,3 @@
-// src/components/ProfileDropdown.jsx
-
 import { useAuth } from "@/context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -15,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Settings, LogOut, User } from "lucide-react";
 
 export function ProfileDropdown({ hamburgerMode = false }) {
   const { currentUser } = useAuth();
@@ -30,7 +29,6 @@ export function ProfileDropdown({ hamburgerMode = false }) {
     }
   };
 
-
   useEffect(() => {
     if (signingOut) {
       router.push("/signin");
@@ -44,42 +42,58 @@ export function ProfileDropdown({ hamburgerMode = false }) {
   if (hamburgerMode) {
     return null;
   }
+ 
   
+  // Then in your AvatarFallback:
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-      <Button
-  variant="ghost"
-  className="relative h-10 w-10 md:mt-2 rounded-full" // Adjusted size
->
-  <Avatar className="h-10 w-10"> 
-    <AvatarImage src={currentUser?.photoURL} alt={currentUser?.displayName} />
-    <AvatarFallback className="text-base bg-gray-600 text-white">
-      {getInitials(currentUser?.displayName)}
-    </AvatarFallback>
-  </Avatar>
-</Button>
-
-      
+        <Button
+          variant="ghost"
+          className="relative h-8 w-8 rounded-full border-0 hover:bg-transparent focus:ring-0 focus:ring-offset-0"
+        >
+          <Avatar className="h-8 w-8 transition-transform hover:scale-105">
+            <AvatarImage 
+              src={currentUser?.photoURL} 
+              alt={currentUser?.displayName} 
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-medium">
+              {getInitials(currentUser?.displayName)}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mt-2 w-56 dark:bg-zinc-800" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
+      <DropdownMenuContent 
+        className="w-56 mt-1 p-2 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg"
+        align="end"
+      >
+        <DropdownMenuLabel className="px-2 py-2">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none dark:text-gray-100">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {currentUser?.displayName}
             </p>
-            <p className="text-xs leading-none text-muted-foreground">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
               {currentUser?.email}
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="dark:text-gray-100 cursor-pointer" onClick={() => router.push('/settings')}>
-            Settings
+        <DropdownMenuSeparator className="bg-gray-200 dark:bg-zinc-700" />
+       
+        <DropdownMenuItem 
+          className="flex items-center px-2 py-2 text-sm text-gray-700 dark:text-gray-200 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-md cursor-pointer"
+          onClick={() => router.push('/settings')}
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Settings
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="dark:text-gray-100 cursor-pointer">
+        <DropdownMenuSeparator className="bg-gray-200 dark:bg-zinc-700" />
+        <DropdownMenuItem 
+          className="flex items-center px-2 py-2 text-sm text-red-400 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-400/20 rounded-md cursor-pointer"
+          onClick={handleSignOut}
+        >
+          <LogOut className="w-4 h-4 mr-2" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

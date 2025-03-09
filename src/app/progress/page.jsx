@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Import analytics components
 import { NutritionMetrics } from "@/components/analytics/NutritionMetrics";
+import { WorkoutMetrics } from "@/components/analytics/WorkoutMetrics";
 
 export default function ProgressPage() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function ProgressPage() {
   const [userMetrics, setUserMetrics] = useState(null);
   const [timeframe, setTimeframe] = useState("week");
   const [foodData, setFoodData] = useState([]);
+  const [exerciseData, setExerciseData] = useState([]);
   const [timeOffset, setTimeOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("nutrition");
@@ -109,7 +111,6 @@ export default function ProgressPage() {
         const previousPeriodStart = new Date(previousPeriodEnd);
         previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
         
-        console.log(`Fetching nutrition data from ${format(previousPeriodStart, "yyyy-MM-dd")} to ${format(currentEnd, "yyyy-MM-dd")}`);
         
         // Expand your date range to include both current and previous periods
         const foodLogsQuery = query(
@@ -140,6 +141,57 @@ export default function ProgressPage() {
   
     fetchNutritionData();
   }, [currentUser, userLoggedIn, timeframe, timeOffset]);
+
+  useEffect(() => {
+    const fetchExerciseData = async () => {
+      if (!userLoggedIn || !currentUser?.uid) return;
+      
+      try {
+        // Calculate the current date range
+        const { start: currentStart, end: currentEnd } = calculateDateRange();
+        
+        // Calculate the previous period date range for comparison
+        const previousPeriodEnd = new Date(currentStart);
+        previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 1);
+        
+        const daysDiff = Math.round((currentEnd - currentStart) / (1000 * 60 * 60 * 24));
+        const previousPeriodStart = new Date(previousPeriodEnd);
+        previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
+        
+        
+        // Query for exercise logs
+        const exerciseLogsQuery = query(
+          collection(db, "exercise_logs"),
+          where("userId", "==", currentUser.uid),
+          where("date", ">=", format(previousPeriodStart, "yyyy-MM-dd")),
+          where("date", "<=", format(currentEnd, "yyyy-MM-dd")),
+          orderBy("date", "desc")
+        );
+  
+        const unsubscribe = onSnapshot(exerciseLogsQuery, (snapshot) => {
+          const exercises = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            // Calculate total volume (weight * reps * sets)
+            totalVolume: doc.data().sets?.reduce((total, set) => {
+              const weight = Number(set.weight || 0);
+              const reps = Number(set.reps || 0);
+              return total + (weight * reps);
+            }, 0) || 0
+          }));
+          
+          setExerciseData(exercises);
+        });
+        
+        return unsubscribe;
+      } catch (error) {
+        console.error("Error fetching exercise data:", error);
+      }
+    };
+  
+    fetchExerciseData();
+  }, [currentUser, userLoggedIn, timeframe, timeOffset, calculateDateRange]);
+  
   // Navigation functions
   const goToPreviousPeriod = () => setTimeOffset(prev => prev - 1);
   const goToNextPeriod = () => timeOffset < 0 && setTimeOffset(prev => prev + 1);
@@ -188,7 +240,7 @@ export default function ProgressPage() {
               Health Summary
             </h1>
             {/* Apple-style time selector */}
-            <div className="flex items-center bg-white dark:bg-zinc-800 rounded-full p-1 shadow-sm">
+            <div className="flex items-center justify-center  bg-white dark:bg-zinc-800 rounded-full p-1 shadow-sm ">
               {timeOptions.map(option => (
                 <button
                   key={option.value}
@@ -196,7 +248,7 @@ export default function ProgressPage() {
                     setTimeframe(option.value);
                     setTimeOffset(0); // Reset offset when changing timeframe
                   }}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-all ${
+                  className={` px-4 py-1.5 text-sm font-medium rounded-full transition-all ${
                     timeframe === option.value 
                       ? 'bg-blue-500 text-white shadow' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -271,10 +323,13 @@ export default function ProgressPage() {
                 />
               </TabsContent>
               
-              <TabsContent value="fitness">
-                <div className="flex items-center justify-center h-60 bg-white dark:bg-zinc-800 rounded-lg">
-                  <p className="text-gray-500 dark:text-gray-400">Fitness metrics will be implemented next</p>
-                </div>
+              <TabsContent value="fitness" className="space-y-6">
+                <WorkoutMetrics 
+                  exerciseData={exerciseData} 
+                  timeframe={timeframe} 
+                  dateRange={dateRange}
+                  userMetrics={userMetrics}
+                />
               </TabsContent>
               
             

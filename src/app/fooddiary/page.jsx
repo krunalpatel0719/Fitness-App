@@ -11,7 +11,7 @@ import { Navbar } from "@/components/Navbar";
 import { MetricsForm } from "@/components/MetricsForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, query, where, orderBy, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import { format } from "date-fns";
 import { FoodMetricsSection } from "@/components/FoodMetricsSection";
 import { FoodDiarySection } from "@/components/FoodDiarySection";
