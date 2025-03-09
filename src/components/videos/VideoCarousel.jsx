@@ -29,7 +29,7 @@ export default function VideoCarousel({ channel, onPlay }) {
   
   return (
     <div className="mb-12">
-      <h2 className="text-xl font-bold text-white mb-4">Recent Videos</h2>
+      <h2 className="text-xl font-bold text-black dark:text-white mb-4">Recent Videos</h2>
       
       <div className="relative group">
         <div 
@@ -49,7 +49,7 @@ export default function VideoCarousel({ channel, onPlay }) {
           <>
             <button 
               onClick={() => scroll('left')}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none z-10"
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 bg-white dark:bg-black bg-opacity-50 hover:bg-opacity-70 text-black dark:text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none z-10"
               aria-label="Scroll left"
             >
               <ChevronLeft size={24} />
@@ -57,7 +57,7 @@ export default function VideoCarousel({ channel, onPlay }) {
             
             <button 
               onClick={() => scroll('right')}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none z-10"
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 bg-white dark:bg-black bg-opacity-50 hover:bg-opacity-70 text-black dark:text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none z-10"
               aria-label="Scroll right"
             >
               <ChevronRight size={24} />

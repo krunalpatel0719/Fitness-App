@@ -16,7 +16,7 @@ export function CalendarHeader({ title, selectedDate, setSelectedDate }) {
           size="icon"
           onClick={() => setSelectedDate(subDays(selectedDate, 1))}
         >
-          <LuChevronLeft className="h-4 w-4 sm:min-h-6 sm:min-w-6" />
+          <LuChevronLeft className="text-black dark:text-white h-4 w-4 sm:min-h-6 sm:min-w-6" />
         </Button>
         <div className="flex flex-col items-center  sm:px-6">
           <span className="tracking-tight text-nowrap text-xs sm:text-lg font-semibold dark:text-white">
@@ -29,7 +29,7 @@ export function CalendarHeader({ title, selectedDate, setSelectedDate }) {
           size="icon"
           onClick={() => setSelectedDate(addDays(selectedDate, 1))}
         >
-          <LuChevronRight className="h-4 w-4 sm:min-h-6 sm:min-w-6" />
+          <LuChevronRight className="text-black dark:text-white h-4 w-4 sm:min-h-6 sm:min-w-6" />
         </Button>
       </div>
     </div>

@@ -49,9 +49,9 @@ export default function SettingsPage() {
       <Navbar />
       
       <main className="flex-1 p-4 md:p-8 ">
-        <div className="max-w-5xl mx-auto dark:bg-zinc-800 rounded-lg shadow-md   border-zinc-700 backdrop-blur-lg">
+        <div className="max-w-5xl mx-auto bg-gray-100 dark:bg-zinc-800 rounded-lg shadow-md   border-zinc-700 backdrop-blur-lg">
           <div className="grid md:grid-cols-[240px_1fr] gap-8  ">
-            <div className="w-full py-6 px-3 border-r border-zinc-700">
+            <div className="w-full py-6 px-3 border-r border-gray-300 dark:border-zinc-700">
               <div className="flex items-center justify-center mb-10 ">
                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white text-lg font-semibold">
@@ -61,15 +61,15 @@ export default function SettingsPage() {
               </div>
               
               {/* Menu Items */}
-              <div className="space-y-1.5 mb-6">
+              <div className="space-y-1.5 mb-6 ">
                 {tabs.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors",
+                      "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ",
                       activeTab === item.id
-                      ? "bg-zinc-700/80 text-white"
+                      ? "bg-gray-400/80 dark:bg-zinc-700/80 text-white"
                       : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
                     )}
                   >
@@ -98,7 +98,7 @@ export default function SettingsPage() {
       </main>
 
       <Dialog open={openMetricsDialog} onOpenChange={setOpenMetricsDialog}>
-        <DialogContent hideClose={true} className="dark:bg-zinc-900 border border-zinc-700">
+        <DialogContent hideClose={true} className="dark:bg-zinc-900 border border-black dark:border-zinc-700">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="flex items-center gap-2 text-xl font-semibold dark:text-white">
@@ -107,9 +107,9 @@ export default function SettingsPage() {
               </DialogTitle>
               <DialogClose asChild>
                 <Button
-                  variant=""
+                 
                   size="icon"
-                  className="h-8 w-8 p-0"
+                  className="bg-white text-black hover:bg-white hover:text-zinc-600 hover:dark:bg-zinc-900 dark:bg-zinc-900 dark:text-white h-8 w-8 p-0"
                 >
                   <X className="h-4 w-4" />
                 </Button>

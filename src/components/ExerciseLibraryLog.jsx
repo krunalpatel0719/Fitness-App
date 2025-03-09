@@ -212,7 +212,7 @@ export function ExerciseLibraryLog({
                   e.stopPropagation();
                   handleQuickAdd(item.id, e);
                 }}
-                className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200"
+                className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200"
               >
                 Cancel
               </button>

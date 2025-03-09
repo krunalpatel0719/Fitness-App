@@ -49,9 +49,9 @@ export function MetricsForm({ onSubmit, initialData }) {
             
             <form onSubmit={handleSubmit} className="space-y-6">
              
-              <div className = "bg-zinc-800/70 p-4 rounded-lg" >
+              <div className = "bg-gray-200/70 dark:bg-zinc-800/70 p-4 rounded-lg" >
                 <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-xl font-semibold text-white">Body Metrics</h2>
+                <h2 className="text-xl font-semibold text-black dark:text-white">Body Metrics</h2>
                </div>
               {/* Height Section with Feet and Inches */}
               <div className="grid grid-cols-2 gap-4 mb-4 ">
@@ -64,7 +64,7 @@ export function MetricsForm({ onSubmit, initialData }) {
                     required
                     value={formData.feet}
                     onChange={(e) => setFormData({ ...formData, feet: e.target.value })}
-                    className="bg-zinc-800 border-zinc-700 text-white"
+                    className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -76,7 +76,7 @@ export function MetricsForm({ onSubmit, initialData }) {
                     required
                     value={formData.inches}
                     onChange={(e) => setFormData({ ...formData, inches: e.target.value })}
-                    className="bg-zinc-800 border-zinc-700 text-white"
+                    className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white"
                   />
                 </div>
               </div>
@@ -91,7 +91,7 @@ export function MetricsForm({ onSubmit, initialData }) {
                   required
                   value={formData.weight}
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700 text-white"
+                  className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white"
                 />
               </div>
               
@@ -105,7 +105,7 @@ export function MetricsForm({ onSubmit, initialData }) {
                   required
                   value={formData.age}
                   onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700 text-white"
+                  className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white"
                 />
               </div>
               
@@ -116,12 +116,12 @@ export function MetricsForm({ onSubmit, initialData }) {
                   value={formData.gender} 
                   onValueChange={(value) => setFormData({ ...formData, gender: value })}
                 >
-                  <SelectTrigger id="gender" className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectTrigger id="gender" className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700">
-                    <SelectItem value="male" className="text-white">Male</SelectItem>
-                    <SelectItem value="female" className="text-white">Female</SelectItem>
+                  <SelectContent className="bg-gray-200 dark:bg-zinc-800 border-zinc-700">
+                    <SelectItem value="male" className="text-black dark:text-white">Male</SelectItem>
+                    <SelectItem value="female" className="text-black dark:text-white">Female</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -133,14 +133,14 @@ export function MetricsForm({ onSubmit, initialData }) {
                   value={formData.activityLevel} 
                   onValueChange={(value) => setFormData({ ...formData, activityLevel: value })}
                 >
-                  <SelectTrigger id="activity-level" className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectTrigger id="activity-level" className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white">
                     <SelectValue placeholder="Select activity level" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700">
-                    <SelectItem value="sedentary" className="text-white">Sedentary (little or no exercise)</SelectItem>
-                    <SelectItem value="lightlyActive" className="text-white">Lightly active (light exercise 1-3 days/week)</SelectItem>
-                    <SelectItem value="active" className="text-white">Moderately active (moderate exercise 3-5 days/week)</SelectItem>
-                    <SelectItem value="veryActive" className="text-white">Very active (hard exercise 6-7 days/week)</SelectItem>
+                  <SelectContent className="bg-gray-200 dark:bg-zinc-800 border-zinc-700">
+                    <SelectItem value="sedentary" className="text-black dark:text-white">Sedentary (little or no exercise)</SelectItem>
+                    <SelectItem value="lightlyActive" className="text-black dark:text-white">Lightly active (light exercise 1-3 days/week)</SelectItem>
+                    <SelectItem value="active" className="text-black dark:text-whitee">Moderately active (moderate exercise 3-5 days/week)</SelectItem>
+                    <SelectItem value="veryActive" className="text-black dark:text-white">Very active (hard exercise 6-7 days/week)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -152,13 +152,13 @@ export function MetricsForm({ onSubmit, initialData }) {
                   value={formData.goal} 
                   onValueChange={(value) => setFormData({ ...formData, goal: value })}
                 >
-                  <SelectTrigger id="goal" className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectTrigger id="goal" className="bg-gray-200 dark:bg-zinc-800 border-zinc-700 text-black dark:text-white">
                     <SelectValue placeholder="Select goal" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700">
-                    <SelectItem value="lose" className="text-white">Lose Weight</SelectItem>
-                    <SelectItem value="maintain" className="text-white">Maintain Weight</SelectItem>
-                    <SelectItem value="gain" className="text-white">Gain Weight</SelectItem>
+                  <SelectContent className="bg-gray-200 dark:bg-zinc-800 border-zinc-700">
+                    <SelectItem value="lose" className="text-black dark:text-white">Lose Weight</SelectItem>
+                    <SelectItem value="maintain" className="text-black dark:text-white">Maintain Weight</SelectItem>
+                    <SelectItem value="gain" className="text-black dark:text-white">Gain Weight</SelectItem>
                   </SelectContent>
                 </Select>
                 </div>

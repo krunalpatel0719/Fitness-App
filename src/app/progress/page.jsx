@@ -37,22 +37,18 @@ export default function ProgressPage() {
         endDate = endOfDay(addDays(now, timeOffset));
         break;
       case "week":
-        // Start from 6 days ago, end with today (for current week)
         endDate = endOfDay(addDays(now, timeOffset * 7));
         startDate = startOfDay(addDays(endDate, -6));
         break;
       case "month":
-        // Approximate a month as 30 days
         endDate = endOfDay(addDays(now, timeOffset * 30));
         startDate = startOfDay(addDays(endDate, -29));
         break;
       case "6 months":
-        // 6 months as 180 days
         endDate = endOfDay(addDays(now, timeOffset * 180));
         startDate = startOfDay(addDays(endDate, -179));
         break;
       case "year":
-        // Year as 365 days
         endDate = endOfDay(addDays(now, timeOffset * 365));
         startDate = startOfDay(addDays(endDate, -364));
         break;
@@ -82,23 +78,19 @@ export default function ProgressPage() {
     return () => unsubscribeUserMetrics();
   }, [currentUser, userLoggedIn, router]);
 
-  // Update date range when timeframe or offset changes
   useEffect(() => {
     const range = calculateDateRange();
     setDateRange(range);
   }, [timeframe, timeOffset, calculateDateRange]);
 
-  // Fetch food data when date range changes
   useEffect(() => {
     const fetchNutritionData = async () => {
       if (!userLoggedIn || !currentUser?.uid) return;
       setLoading(true);
   
       try {
-        // Calculate the current date range
         const { start: currentStart, end: currentEnd } = calculateDateRange();
         
-        // Calculate the previous period date range for comparison
         const previousPeriodEnd = new Date(currentStart);
         previousPeriodEnd.setDate(previousPeriodEnd.getDate() - 1);
         
@@ -107,7 +99,6 @@ export default function ProgressPage() {
         previousPeriodStart.setDate(previousPeriodStart.getDate() - daysDiff);
         
         
-        // Expand your date range to include both current and previous periods
         const foodLogsQuery = query(
           collection(db, "food_logs"),
           where("userId", "==", currentUser.uid),

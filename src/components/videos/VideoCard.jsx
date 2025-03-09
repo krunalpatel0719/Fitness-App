@@ -36,7 +36,7 @@ export default function VideoCard({ video, onPlay }) {
       </div>
       
       <div className="mt-2">
-        <h3 className={`text-sm font-medium line-clamp-2 transition-colors duration-300 ${isHovered ? 'text-blue-400' : 'text-gray-100'}`}>
+        <h3 className={`text-sm font-medium line-clamp-2 transition-colors duration-300 ${isHovered ? 'text-blue-400' : 'text-gray-700 dark:text-gray-100'}`}>
           {video.title}
         </h3>
         <div className="flex items-center text-xs text-gray-400 mt-1 space-x-2">

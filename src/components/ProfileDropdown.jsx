@@ -89,12 +89,14 @@ export function ProfileDropdown({ hamburgerMode = false }) {
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-gray-200 dark:bg-zinc-700" />
         <DropdownMenuItem 
-          className="flex items-center px-2 py-2 text-sm text-red-400 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-400/20 rounded-md cursor-pointer"
-          onClick={handleSignOut}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign out
-        </DropdownMenuItem>
+  className="flex items-center px-2 py-2 text-sm text-red-400 rounded-md cursor-pointer
+             hover:bg-red-50 dark:hover:bg-red-400/20 hover:text-red-400 dark:hover:text-red-400
+             focus:bg-red-50 focus:text-red-400 dark:focus:bg-red-400/20 dark:focus:text-red-400"
+  onClick={handleSignOut}
+>
+  <LogOut className="w-4 h-4 mr-2" />
+  Sign out
+</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

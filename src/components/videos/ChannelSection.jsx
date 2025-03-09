@@ -17,7 +17,7 @@ export default function ChannelSection({ channel, onPlay }) {
             className="w-10 h-10 rounded-full border-2 border-blue-500 flex-shrink-0"
           />
           <div className="min-w-0 flex-1">
-            <h2 className="text-base sm:text-xl font-bold text-white flex items-center truncate">
+            <h2 className="text-base sm:text-xl font-bold text-black dark:text-white flex items-center truncate">
               <span className="truncate">{channel.channelTitle}</span>
               <a 
                 href={`https://www.youtube.com/channel/${channel.channelId}`}

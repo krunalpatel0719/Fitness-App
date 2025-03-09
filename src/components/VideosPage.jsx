@@ -76,7 +76,7 @@ export default function VideosPage() {
   
   if (isLoading && !initialData) {
     return (
-      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen dark:bg-zinc-900 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-white text-lg">Loading videos...</p>
@@ -87,7 +87,7 @@ export default function VideosPage() {
   
   if (error && !channels) {
     return (
-      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen dark:bg-zinc-900 flex items-center justify-center">
         <div className="bg-red-500 bg-opacity-20 border border-red-400 text-red-100 px-4 py-3 rounded">
           <p>Failed to load videos. Please try again later.</p>
         </div>
@@ -96,9 +96,9 @@ export default function VideosPage() {
   }
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 text-white">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-white">Featured Videos</h1>
+        <h1 className="text-3xl font-bold mb-8 text-black dark:text-white">Featured Videos</h1>
         
         {/* Video Player or Featured Video */}
         {isPlaying && selectedVideo ? (
