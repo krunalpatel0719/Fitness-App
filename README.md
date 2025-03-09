@@ -1,6 +1,12 @@
 # Fitness App
 
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It is an open-source application for tracking fitness data, including nutrition and exercise metrics, and displays progress analytics in real time.
+
+To see and use the app live:
+
+https://fitness-app-eight-nu.vercel.app/
+
 
 ## Features
 
@@ -8,6 +14,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - **Data Analytics:** Tracks nutrition and exercise data with aggregated analytics.
 - **Progress Dashboard:** Visualizes data via charts with optimized Firestore queries.
 - **Integration:** Connects with external APIs including FatSecret for food data and a free exercise database.
+
+
 
 ## Getting Started
 
@@ -48,3 +56,6 @@ Open http://localhost:3000 with your browser to see your app in action.
 Special Thanks
 FatSecret: Special thanks to FatSecret for providing access to their API https://www.fatsecret.com/.
 Free Exercise Database: Special thanks to yuhonas for this free exercise database https://github.com/yuhonas/free-exercise-db.
+
+
+## Screenshots
